@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +8,16 @@ import { Loader2, Search, ArrowUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IdeaResult {
-  id: string;
-  title: string;
-  description: string;
+  id: string | number;
+  productArea?: string;
+  summary?: string;
+  releaseNote?: string;
+  idea?: string;
+  content?: string;
   score: number;
+  // Legacy properties for backward compatibility
+  title?: string;
+  description?: string;
   category?: string;
   url?: string;
 }
@@ -60,11 +65,17 @@ const Index = () => {
       // Ensure each item has required properties
       const processedIdeas = ideas.map((item, index) => ({
         id: item.id || `idea-${index}`,
-        title: item.title || item.name || 'Untitled',
-        description: item.description || item.summary || 'No description',
+        productArea: item.productArea || item.category || 'General',
+        summary: item.summary || item.title || 'No summary',
+        releaseNote: item.releaseNote || item.description || 'No release note',
+        idea: item.idea || `IDEA-${item.id || index}`,
+        content: item.content || item.description || 'No content',
         score: typeof item.score === 'number' ? item.score : Math.random() * 100,
-        category: item.category || 'General',
-        url: item.url || item.link
+        // Keep legacy properties for compatibility
+        title: item.title || item.summary,
+        description: item.description || item.content,
+        category: item.category || item.productArea,
+        url: item.url
       }));
 
       setResults(processedIdeas);
@@ -98,9 +109,9 @@ const Index = () => {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'bg-green-100 text-green-800 border-green-200';
-    if (score >= 60) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (score >= 40) return 'bg-orange-100 text-orange-800 border-orange-200';
+    if (score >= 0.8) return 'bg-green-100 text-green-800 border-green-200';
+    if (score >= 0.6) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    if (score >= 0.4) return 'bg-orange-100 text-orange-800 border-orange-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
 
@@ -171,15 +182,16 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[100px]">Score</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead className="w-[120px]">Category</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="w-[100px]">Action</TableHead>
+                      <TableHead className="w-[120px]">Idea ID</TableHead>
+                      <TableHead className="w-[200px]">Product Area</TableHead>
+                      <TableHead className="w-[200px]">Summary</TableHead>
+                      <TableHead className="min-w-[300px]">Release Note</TableHead>
+                      <TableHead className="min-w-[300px]">Content</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -190,30 +202,27 @@ const Index = () => {
                             variant="outline" 
                             className={`font-mono ${getScoreColor(idea.score)}`}
                           >
-                            {idea.score.toFixed(1)}
+                            {idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium">{idea.title}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{idea.category}</Badge>
+                        <TableCell className="font-medium">
+                          {idea.idea || `IDEA-${idea.id}`}
                         </TableCell>
-                        <TableCell className="max-w-md">
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {idea.description}
+                        <TableCell>
+                          <Badge variant="secondary">{idea.productArea}</Badge>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {idea.summary}
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-sm text-gray-600 max-w-md whitespace-normal">
+                            {idea.releaseNote}
                           </p>
                         </TableCell>
                         <TableCell>
-                          {idea.url ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.open(idea.url, '_blank')}
-                            >
-                              View
-                            </Button>
-                          ) : (
-                            <span className="text-gray-400 text-sm">N/A</span>
-                          )}
+                          <p className="text-sm text-gray-600 max-w-md whitespace-normal">
+                            {idea.content}
+                          </p>
                         </TableCell>
                       </TableRow>
                     ))}
