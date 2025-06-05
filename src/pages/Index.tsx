@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -186,18 +187,18 @@ const Index = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[100px]">Score</TableHead>
-                      <TableHead className="w-[120px]">Idea ID</TableHead>
-                      <TableHead className="w-[200px]">Product Area</TableHead>
-                      <TableHead className="w-[200px]">Summary</TableHead>
+                      <TableHead className="w-[100px] bg-blue-50 font-bold">Score</TableHead>
+                      <TableHead className="w-[120px] bg-blue-50 font-bold">Idea ID</TableHead>
+                      <TableHead className="min-w-[300px] bg-blue-50 font-bold">Content</TableHead>
                       <TableHead className="min-w-[300px]">Release Note</TableHead>
-                      <TableHead className="min-w-[300px]">Content</TableHead>
+                      <TableHead className="w-[200px]">Summary</TableHead>
+                      <TableHead className="w-[200px]">Product Area</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {sortedResults.map((idea) => (
                       <TableRow key={idea.id} className="hover:bg-gray-50">
-                        <TableCell>
+                        <TableCell className="bg-blue-25">
                           <Badge 
                             variant="outline" 
                             className={`font-mono ${getScoreColor(idea.score)}`}
@@ -205,24 +206,24 @@ const Index = () => {
                             {idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium bg-blue-25">
                           {idea.idea || `IDEA-${idea.id}`}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{idea.productArea}</Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {idea.summary}
+                        <TableCell className="bg-blue-25">
+                          <p className="text-sm text-gray-600 max-w-md whitespace-normal">
+                            {idea.content}
+                          </p>
                         </TableCell>
                         <TableCell>
                           <p className="text-sm text-gray-600 max-w-md whitespace-normal">
                             {idea.releaseNote}
                           </p>
                         </TableCell>
+                        <TableCell className="font-medium">
+                          {idea.summary}
+                        </TableCell>
                         <TableCell>
-                          <p className="text-sm text-gray-600 max-w-md whitespace-normal">
-                            {idea.content}
-                          </p>
+                          <Badge variant="secondary">{idea.productArea}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
