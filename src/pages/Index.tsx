@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,6 +97,11 @@ const Index = () => {
     }
   };
 
+  const handleUpdateClick = (ideaId: string) => {
+    const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
+    window.open(url, '_blank');
+  };
+
   const sortedResults = [...results].sort((a, b) => {
     if (sortOrder === 'desc') {
       return b.score - a.score;
@@ -189,10 +193,11 @@ const Index = () => {
                     <TableRow>
                       <TableHead className="w-[100px] bg-blue-50 font-bold">Score</TableHead>
                       <TableHead className="w-[120px] bg-blue-50 font-bold">Idea ID</TableHead>
-                      <TableHead className="min-w-[300px] bg-blue-50 font-bold">Content</TableHead>
+                      <TableHead className="min-w-[300px] bg-blue-50 font-bold">Idea Description</TableHead>
                       <TableHead className="min-w-[300px]">Release Note</TableHead>
                       <TableHead className="w-[200px]">Summary</TableHead>
                       <TableHead className="w-[200px]">Product Area</TableHead>
+                      <TableHead className="w-[120px]">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -224,6 +229,16 @@ const Index = () => {
                         </TableCell>
                         <TableCell>
                           <Badge variant="secondary">{idea.productArea}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            Update
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
