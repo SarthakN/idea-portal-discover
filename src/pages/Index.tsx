@@ -43,7 +43,9 @@ const Index = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5678/webhook/8186e3fd-4088-4dbd-83a9-249867c64014', {
+      //test - http://localhost:5678/webhook-test/8186e3fd-4088-4dbd-83a9-249867c64014
+      //prod - http://localhost:5678/webhook/8186e3fd-4088-4dbd-83a9-249867c64014
+      const response = await fetch('http://localhost:5678/webhook-test/8186e3fd-4088-4dbd-83a9-249867c64014', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
