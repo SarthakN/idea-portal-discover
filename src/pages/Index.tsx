@@ -198,7 +198,7 @@ const Index = () => {
       case 'Match found':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'Related':
-        return 'bg-green-50 text-blue-700 border-blue-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'Peripheral insight':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
