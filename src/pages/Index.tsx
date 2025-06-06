@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, ArrowUpDown, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -22,37 +20,37 @@ interface IdeaResult {
   category?: string;
   url?: string;
 }
-
 const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [doppelgangerLoading, setDoppelgangerLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
-
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5678/webhook/8186e3fd-4088-4dbd-83a9-249867c64014', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: url })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: url
+        })
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       console.log('Webhook response:', data);
-      
+
       // Handle different response formats
       let ideas: IdeaResult[] = [];
-      
       if (Array.isArray(data)) {
         ideas = data;
       } else if (data.ideas && Array.isArray(data.ideas)) {
@@ -79,85 +77,75 @@ const Index = () => {
         category: item.category || item.productArea,
         url: item.url
       }));
-
       setResults(processedIdeas);
-      
       toast({
         title: "AI Analysis Complete! 🤖",
-        description: `Found ${processedIdeas.length} matching ideas using AI-powered analysis.`,
+        description: `Found ${processedIdeas.length} matching ideas using AI-powered analysis.`
       });
-
     } catch (err) {
       console.error('Error:', err);
       toast({
         title: "Error",
         description: "Failed to analyze release notes. Please check the URL and try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   const handleDoppelganger = async () => {
     setDoppelgangerLoading(true);
     try {
       // Placeholder webhook call - replace with actual endpoint
       const response = await fetch('http://localhost:5678/webhook/doppelganger-endpoint', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'find_doppelgangers' })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'find_doppelgangers'
+        })
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       console.log('Doppelganger response:', data);
-      
       toast({
         title: "AI Doppelgänger Search Complete! 👯",
-        description: "Found ideas that look suspiciously familiar.",
+        description: "Found ideas that look suspiciously familiar."
       });
-
     } catch (err) {
       console.error('Error:', err);
       toast({
         title: "Error",
         description: "Failed to find idea doppelgängers. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setDoppelgangerLoading(false);
     }
   };
-
   const handleUpdateClick = (ideaId: string) => {
     const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
     window.open(url, '_blank');
   };
-
   const sortedResults = [...results].sort((a, b) => {
     if (sortOrder === 'desc') {
       return b.score - a.score;
     }
     return a.score - b.score;
   });
-
   const toggleSort = () => {
     setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
   };
-
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 0.6) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     if (score >= 0.4) return 'bg-orange-100 text-orange-800 border-orange-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -172,30 +160,19 @@ const Index = () => {
               <Search className="h-5 w-5" />
               Find matching ideas
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-thin text-xs">
               Enter release notes URL (e.g. https://ut.powerschool-docs.com/app-tracking-employer/latest/release-25-3-1-0-march-2025)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="https://example.com/release-notes"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  required
-                  className="flex-1"
-                />
+                <Input type="url" placeholder="https://example.com/release-notes" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" />
                 <Button type="submit" disabled={loading}>
-                  {loading ? (
-                    <>
+                  {loading ? <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       AI is thinking...
-                    </>
-                  ) : (
-                    'Submit'
-                  )}
+                    </> : 'Submit'}
                 </Button>
               </div>
             </form>
@@ -205,24 +182,14 @@ const Index = () => {
         {/* Idea Doppelgänger Button */}
         <div className="flex justify-center">
           <div className="text-center">
-            <Button 
-              onClick={handleDoppelganger} 
-              disabled={doppelgangerLoading}
-              variant="outline"
-              size="sm"
-              className="mb-2"
-            >
-              {doppelgangerLoading ? (
-                <>
+            <Button onClick={handleDoppelganger} disabled={doppelgangerLoading} variant="outline" size="sm" className="mb-2">
+              {doppelgangerLoading ? <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   AI is searching...
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
-                </>
-              )}
+                </>}
             </Button>
             <p className="text-sm text-gray-500">
               find ideas that look suspiciously familiar
@@ -231,17 +198,11 @@ const Index = () => {
         </div>
 
         {/* Results Table */}
-        {results.length > 0 && (
-          <Card>
+        {results.length > 0 && <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Ideas Found ({results.length})</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleSort}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" size="sm" onClick={toggleSort} className="flex items-center gap-2">
                   <ArrowUpDown className="h-4 w-4" />
                   Sort by Score ({sortOrder === 'desc' ? 'High to Low' : 'Low to High'})
                 </Button>
@@ -265,13 +226,9 @@ const Index = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedResults.map((idea) => (
-                      <TableRow key={idea.id} className="hover:bg-gray-50">
+                    {sortedResults.map(idea => <TableRow key={idea.id} className="hover:bg-gray-50">
                         <TableCell className="bg-blue-50">
-                          <Badge 
-                            variant="outline" 
-                            className={`font-mono ${getScoreColor(idea.score)}`}
-                          >
+                          <Badge variant="outline" className={`font-mono ${getScoreColor(idea.score)}`}>
                             {idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
@@ -295,27 +252,19 @@ const Index = () => {
                           <Badge variant="secondary">{idea.productArea}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)} className="text-blue-600 hover:text-blue-800">
                             Update
                           </Button>
                         </TableCell>
-                      </TableRow>
-                    ))}
+                      </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && (
-          <Card className="text-center py-12">
+        {!loading && results.length === 0 && <Card className="text-center py-12">
             <CardContent>
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
@@ -323,11 +272,8 @@ const Index = () => {
                 <p className="text-gray-500">Enter a release notes URL above to start discovering ideas</p>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
