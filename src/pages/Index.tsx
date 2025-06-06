@@ -269,7 +269,7 @@ const Index = () => {
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
                 <h3 className="text-lg font-medium text-gray-900">No ideas found yet</h3>
-                <p className="text-gray-500">Enter a release notes URL above to start discovering ideas</p>
+                
               </div>
             </CardContent>
           </Card>}
