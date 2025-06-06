@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, ArrowUpDown, Bot } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -14,24 +16,31 @@ interface IdeaResult {
   idea?: string;
   content?: string;
   score: number;
+  classification?: string;
   // Legacy properties for backward compatibility
   title?: string;
   description?: string;
   category?: string;
   url?: string;
 }
+
+type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
+type SortOrder = 'asc' | 'desc';
+
 const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [doppelgangerLoading, setDoppelgangerLoading] = useState(false);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const {
-    toast
-  } = useToast();
+  const [thinkLonger, setThinkLonger] = useState(false);
+  const [sortField, setSortField] = useState<SortField>('score');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
+    
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5678/webhook/8186e3fd-4088-4dbd-83a9-249867c64014', {
@@ -40,12 +49,15 @@ const Index = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: url
+          message: url,
+          mode: thinkLonger ? 1 : 0
         })
       });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
       console.log('Webhook response:', data);
 
@@ -71,12 +83,14 @@ const Index = () => {
         idea: item.idea || `IDEA-${item.id || index}`,
         content: item.content || item.description || 'No content',
         score: typeof item.score === 'number' ? item.score : Math.random() * 100,
+        classification: item.classification || (thinkLonger ? 'Match found' : undefined),
         // Keep legacy properties for compatibility
         title: item.title || item.summary,
         description: item.description || item.content,
         category: item.category || item.productArea,
         url: item.url
       }));
+      
       setResults(processedIdeas);
       toast({
         title: "AI Analysis Complete! 🤖",
@@ -93,6 +107,7 @@ const Index = () => {
       setLoading(false);
     }
   };
+
   const handleDoppelganger = async () => {
     setDoppelgangerLoading(true);
     try {
@@ -126,26 +141,80 @@ const Index = () => {
       setDoppelgangerLoading(false);
     }
   };
+
   const handleUpdateClick = (ideaId: string) => {
     const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
     window.open(url, '_blank');
   };
-  const sortedResults = [...results].sort((a, b) => {
-    if (sortOrder === 'desc') {
-      return b.score - a.score;
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
     }
-    return a.score - b.score;
-  });
-  const toggleSort = () => {
-    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc');
   };
+
+  const sortedResults = [...results].sort((a, b) => {
+    let aValue: any;
+    let bValue: any;
+
+    if (thinkLonger && sortField === 'classification') {
+      aValue = a.classification || '';
+      bValue = b.classification || '';
+    } else if (sortField === 'score') {
+      aValue = a.score;
+      bValue = b.score;
+    } else {
+      aValue = a[sortField] || '';
+      bValue = b[sortField] || '';
+    }
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
+    }
+
+    const aStr = String(aValue).toLowerCase();
+    const bStr = String(bValue).toLowerCase();
+    
+    if (sortOrder === 'desc') {
+      return bStr.localeCompare(aStr);
+    }
+    return aStr.localeCompare(bStr);
+  });
+
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 0.6) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     if (score >= 0.4) return 'bg-orange-100 text-orange-800 border-orange-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
-  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+
+  const getClassificationColor = (classification: string) => {
+    switch (classification) {
+      case 'Match found':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'Related':
+        return 'bg-green-50 text-green-700 border-green-100';
+      case 'Peripheral insight':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1" />;
+    }
+    return sortOrder === 'desc' ? 
+      <ChevronDown className="h-4 w-4 ml-1" /> : 
+      <ChevronUp className="h-4 w-4 ml-1" />;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -167,13 +236,39 @@ const Index = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" />
+                <Input
+                  type="url"
+                  placeholder="Enter URL"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  required
+                  className="flex-1"
+                />
                 <Button type="submit" disabled={loading}>
-                  {loading ? <>
+                  {loading ? (
+                    <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       AI is thinking...
-                    </> : 'Submit'}
+                    </>
+                  ) : (
+                    'Submit'
+                  )}
                 </Button>
+              </div>
+              
+              {/* Think for longer toggle */}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="think-longer"
+                  checked={thinkLonger}
+                  onCheckedChange={setThinkLonger}
+                />
+                <label
+                  htmlFor="think-longer"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Think for longer
+                </label>
               </div>
             </form>
           </CardContent>
@@ -182,14 +277,24 @@ const Index = () => {
         {/* Idea Doppelgänger Button */}
         <div className="flex justify-center">
           <div className="text-center">
-            <Button onClick={handleDoppelganger} disabled={doppelgangerLoading} variant="outline" size="sm" className="mb-2">
-              {doppelgangerLoading ? <>
+            <Button
+              onClick={handleDoppelganger}
+              disabled={doppelgangerLoading}
+              variant="outline"
+              size="sm"
+              className="mb-2"
+            >
+              {doppelgangerLoading ? (
+                <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   AI is searching...
-                </> : <>
+                </>
+              ) : (
+                <>
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
-                </>}
+                </>
+              )}
             </Button>
             <p className="text-sm text-gray-500">
               find ideas that look suspiciously similar
@@ -198,17 +303,14 @@ const Index = () => {
         </div>
 
         {/* Results Table */}
-        {results.length > 0 && <Card>
+        {results.length > 0 && (
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Ideas Found ({results.length})</span>
-                <Button variant="outline" size="sm" onClick={toggleSort} className="flex items-center gap-2">
-                  <ArrowUpDown className="h-4 w-4" />
-                  Sort by Score ({sortOrder === 'desc' ? 'High to Low' : 'Low to High'})
-                </Button>
+              <CardTitle>
+                Ideas Found ({results.length})
               </CardTitle>
               <CardDescription>
-                Ideas extracted from the release notes, ranked by AI relevance score
+                Ideas extracted from the release notes, ranked by AI relevance {thinkLonger ? 'classification' : 'score'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -216,20 +318,79 @@ const Index = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[100px] bg-blue-100 font-bold">Score</TableHead>
-                      <TableHead className="w-[120px] bg-blue-100 font-bold">Idea ID</TableHead>
-                      <TableHead className="min-w-[300px] bg-blue-100 font-bold">Idea Description</TableHead>
-                      <TableHead className="min-w-[300px]">Release Note</TableHead>
-                      <TableHead className="w-[200px]">Summary</TableHead>
-                      <TableHead className="w-[200px]">Product Area</TableHead>
+                      <TableHead 
+                        className="w-[100px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
+                        onClick={() => handleSort(thinkLonger ? 'classification' : 'score')}
+                      >
+                        <div className="flex items-center">
+                          {thinkLonger ? 'Classification' : 'Score'}
+                          {renderSortIcon(thinkLonger ? 'classification' : 'score')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="w-[120px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
+                        onClick={() => handleSort('idea')}
+                      >
+                        <div className="flex items-center">
+                          Idea ID
+                          {renderSortIcon('idea')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="min-w-[300px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
+                        onClick={() => handleSort('content')}
+                      >
+                        <div className="flex items-center">
+                          Idea Description
+                          {renderSortIcon('content')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="min-w-[300px] cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort('releaseNote')}
+                      >
+                        <div className="flex items-center">
+                          Release Note
+                          {renderSortIcon('releaseNote')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="w-[200px] cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort('summary')}
+                      >
+                        <div className="flex items-center">
+                          Summary
+                          {renderSortIcon('summary')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="w-[200px] cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleSort('productArea')}
+                      >
+                        <div className="flex items-center">
+                          Product Area
+                          {renderSortIcon('productArea')}
+                        </div>
+                      </TableHead>
                       <TableHead className="w-[120px]">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedResults.map(idea => <TableRow key={idea.id} className="hover:bg-gray-50">
+                    {sortedResults.map((idea) => (
+                      <TableRow key={idea.id} className="hover:bg-gray-50">
                         <TableCell className="bg-blue-50">
-                          <Badge variant="outline" className={`font-mono ${getScoreColor(idea.score)}`}>
-                            {idea.score.toFixed(3)}
+                          <Badge 
+                            variant="outline" 
+                            className={`font-mono ${
+                              thinkLonger && idea.classification 
+                                ? getClassificationColor(idea.classification)
+                                : getScoreColor(idea.score)
+                            }`}
+                          >
+                            {thinkLonger && idea.classification 
+                              ? idea.classification 
+                              : idea.score.toFixed(3)
+                            }
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium bg-blue-50">
@@ -252,28 +413,38 @@ const Index = () => {
                           <Badge variant="secondary">{idea.productArea}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Button variant="outline" size="sm" onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)} className="text-blue-600 hover:text-blue-800">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
                             Update
                           </Button>
                         </TableCell>
-                      </TableRow>)}
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>}
+          </Card>
+        )}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && <Card className="text-center py-12">
+        {!loading && results.length === 0 && (
+          <Card className="text-center py-12">
             <CardContent>
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
                 <h3 className="text-lg font-medium text-gray-900">No ideas found yet</h3>
-                
               </div>
             </CardContent>
-          </Card>}
+          </Card>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
