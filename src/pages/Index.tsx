@@ -199,33 +199,36 @@ const Index = () => {
                 </Button>
               </div>
             </form>
-            
-            {/* Idea Doppelgänger Button */}
-            <div className="mt-4 pt-4 border-t">
-              <Button 
-                onClick={handleDoppelganger} 
-                disabled={doppelgangerLoading}
-                variant="outline"
-                className="w-full"
-              >
-                {doppelgangerLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    AI is searching...
-                  </>
-                ) : (
-                  <>
-                    <Bot className="mr-2 h-4 w-4" />
-                    Idea Doppelgänger
-                  </>
-                )}
-              </Button>
-              <p className="text-sm text-gray-500 text-center mt-1">
-                find ideas that look suspiciously familiar
-              </p>
-            </div>
           </CardContent>
         </Card>
+
+        {/* Idea Doppelgänger Button */}
+        <div className="flex justify-center">
+          <div className="text-center">
+            <Button 
+              onClick={handleDoppelganger} 
+              disabled={doppelgangerLoading}
+              variant="outline"
+              size="sm"
+              className="mb-2"
+            >
+              {doppelgangerLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  AI is searching...
+                </>
+              ) : (
+                <>
+                  <Bot className="mr-2 h-4 w-4" />
+                  Idea Doppelgänger
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-gray-500">
+              find ideas that look suspiciously familiar
+            </p>
+          </div>
+        </div>
 
         {/* Results Table */}
         {results.length > 0 && (
