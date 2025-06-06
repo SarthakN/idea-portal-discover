@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, ArrowUpDown } from "lucide-react";
+import { Loader2, Search, ArrowUpDown, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IdeaResult {
@@ -26,6 +27,7 @@ const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [doppelgangerLoading, setDoppelgangerLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const { toast } = useToast();
 
@@ -81,19 +83,53 @@ const Index = () => {
       setResults(processedIdeas);
       
       toast({
-        title: "Success!",
-        description: `Found ${processedIdeas.length} ideas from the release notes.`,
+        title: "AI Analysis Complete! 🤖",
+        description: `Found ${processedIdeas.length} matching ideas using AI-powered analysis.`,
       });
 
     } catch (err) {
       console.error('Error:', err);
       toast({
         title: "Error",
-        description: "Failed to fetch ideas. Please check the URL and try again.",
+        description: "Failed to analyze release notes. Please check the URL and try again.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDoppelganger = async () => {
+    setDoppelgangerLoading(true);
+    try {
+      // Placeholder webhook call - replace with actual endpoint
+      const response = await fetch('http://localhost:5678/webhook/doppelganger-endpoint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'find_doppelgangers' })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Doppelganger response:', data);
+      
+      toast({
+        title: "AI Doppelgänger Search Complete! 👯",
+        description: "Found ideas that look suspiciously familiar.",
+      });
+
+    } catch (err) {
+      console.error('Error:', err);
+      toast({
+        title: "Error",
+        description: "Failed to find idea doppelgängers. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDoppelgangerLoading(false);
     }
   };
 
@@ -125,8 +161,8 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900">Ideas Portal Finder</h1>
-          <p className="text-lg text-gray-600">Analyze release notes and discover relevant ideas</p>
+          <h1 className="text-4xl font-bold text-gray-900">Not a bad <strong>IDEA</strong> 😏</h1>
+          <p className="text-lg text-gray-600">One person's wild idea is another's Jira ticket.</p>
         </div>
 
         {/* Input Form */}
@@ -134,10 +170,10 @@ const Index = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              Enter Release Notes URL
+              Find matching ideas
             </CardTitle>
             <CardDescription>
-              Provide a URL to release notes for analysis and idea extraction
+              Enter release notes URL (e.g. https://ut.powerschool-docs.com/app-tracking-employer/latest/release-25-3-1-0-march-2025)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -155,7 +191,7 @@ const Index = () => {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Analyzing...
+                      AI is thinking...
                     </>
                   ) : (
                     'Submit'
@@ -163,6 +199,31 @@ const Index = () => {
                 </Button>
               </div>
             </form>
+            
+            {/* Idea Doppelgänger Button */}
+            <div className="mt-4 pt-4 border-t">
+              <Button 
+                onClick={handleDoppelganger} 
+                disabled={doppelgangerLoading}
+                variant="outline"
+                className="w-full"
+              >
+                {doppelgangerLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    AI is searching...
+                  </>
+                ) : (
+                  <>
+                    <Bot className="mr-2 h-4 w-4" />
+                    Idea Doppelgänger
+                  </>
+                )}
+              </Button>
+              <p className="text-sm text-gray-500 text-center mt-1">
+                find ideas that look suspiciously familiar
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -183,7 +244,7 @@ const Index = () => {
                 </Button>
               </CardTitle>
               <CardDescription>
-                Ideas extracted from the release notes, ranked by relevance score
+                Ideas extracted from the release notes, ranked by AI relevance score
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -191,9 +252,9 @@ const Index = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[100px] bg-blue-50 font-bold">Score</TableHead>
-                      <TableHead className="w-[120px] bg-blue-50 font-bold">Idea ID</TableHead>
-                      <TableHead className="min-w-[300px] bg-blue-50 font-bold">Idea Description</TableHead>
+                      <TableHead className="w-[100px] bg-blue-100 font-bold">Score</TableHead>
+                      <TableHead className="w-[120px] bg-blue-100 font-bold">Idea ID</TableHead>
+                      <TableHead className="min-w-[300px] bg-blue-100 font-bold">Idea Description</TableHead>
                       <TableHead className="min-w-[300px]">Release Note</TableHead>
                       <TableHead className="w-[200px]">Summary</TableHead>
                       <TableHead className="w-[200px]">Product Area</TableHead>
@@ -203,7 +264,7 @@ const Index = () => {
                   <TableBody>
                     {sortedResults.map((idea) => (
                       <TableRow key={idea.id} className="hover:bg-gray-50">
-                        <TableCell className="bg-blue-25">
+                        <TableCell className="bg-blue-50">
                           <Badge 
                             variant="outline" 
                             className={`font-mono ${getScoreColor(idea.score)}`}
@@ -211,10 +272,10 @@ const Index = () => {
                             {idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-medium bg-blue-25">
+                        <TableCell className="font-medium bg-blue-50">
                           {idea.idea || `IDEA-${idea.id}`}
                         </TableCell>
-                        <TableCell className="bg-blue-25">
+                        <TableCell className="bg-blue-50">
                           <p className="text-sm text-gray-600 max-w-md whitespace-normal">
                             {idea.content}
                           </p>
