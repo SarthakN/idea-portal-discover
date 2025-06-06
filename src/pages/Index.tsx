@@ -421,7 +421,7 @@ const Index = () => {
                             onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)}
                             className="text-blue-600 hover:text-blue-800"
                           >
-                            Update
+                            Go to JIRA
                           </Button>
                         </TableCell>
                       </TableRow>
