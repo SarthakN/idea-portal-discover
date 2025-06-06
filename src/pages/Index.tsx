@@ -188,8 +188,8 @@ const Index = () => {
 
   const getScoreColor = (score: number) => {
     if (score >= 0.8) return 'bg-green-100 text-green-800 border-green-200';
-    if (score >= 0.6) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (score >= 0.4) return 'bg-orange-100 text-orange-800 border-orange-200';
+    if (score >= 0.6) return 'bg-yellow-100 text-blue-800 border-yellow-200';
+    if (score >= 0.4) return 'bg-orange-100 text-yellow-800 border-orange-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
 
@@ -198,7 +198,7 @@ const Index = () => {
       case 'Match found':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'Related':
-        return 'bg-green-50 text-green-700 border-green-100';
+        return 'bg-green-50 text-blue-800 border-green-100';
       case 'Peripheral insight':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
