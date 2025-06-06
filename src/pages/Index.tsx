@@ -167,7 +167,7 @@ const Index = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <Input type="url" placeholder="https://example.com/release-notes" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" />
+                <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" />
                 <Button type="submit" disabled={loading}>
                   {loading ? <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -192,7 +192,7 @@ const Index = () => {
                 </>}
             </Button>
             <p className="text-sm text-gray-500">
-              find ideas that look suspiciously familiar
+              find ideas that look suspiciously similar
             </p>
           </div>
         </div>
