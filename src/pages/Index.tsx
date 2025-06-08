@@ -8,7 +8,6 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -24,21 +23,9 @@ interface IdeaResult {
   category?: string;
   url?: string;
 }
-
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
-
-const funnyLoadingMessages = [
-  "Go grab a coffee… or make one for me too?",
-  "Still faster than airport Wi-Fi.",
-  "You wait. I'll pretend to optimize.", 
-  "Time is relative. Especially mine.",
-  "Trying to look busy so you don't leave.",
-  "Loading... because instant gratification is overrated.",
-  "Every second you wait, a byte finds meaning.",
-  "Negotiating with the loading gods. They're moody today."
-];
-
+const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
 const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
@@ -51,14 +38,16 @@ const Index = () => {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
   const [currentDoppelgangerMessageIndex, setCurrentDoppelgangerMessageIndex] = useState(0);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   // Cycle through loading messages every 5 seconds for main loading
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (loading) {
       interval = setInterval(() => {
-        setCurrentLoadingMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+        setCurrentLoadingMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
       }, 15000);
     }
     return () => {
@@ -71,7 +60,7 @@ const Index = () => {
     let interval: NodeJS.Timeout;
     if (doppelgangerLoading) {
       interval = setInterval(() => {
-        setCurrentDoppelgangerMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+        setCurrentDoppelgangerMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
       }, 5000);
     }
     return () => {
@@ -85,17 +74,14 @@ const Index = () => {
       setCurrentLoadingMessageIndex(0);
     }
   }, [loading]);
-
   useEffect(() => {
     if (doppelgangerLoading) {
       setCurrentDoppelgangerMessageIndex(0);
     }
   }, [doppelgangerLoading]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
-    
     setLoading(true);
     try {
       //test - http://localhost:5678/webhook-test/8186e3fd-4088-4dbd-83a9-249867c64014
@@ -110,11 +96,9 @@ const Index = () => {
           mode: thinkLonger ? 1 : 0
         })
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       const data = await response.json();
       console.log('Webhook response:', data);
 
@@ -130,7 +114,7 @@ const Index = () => {
         // If response is a single object, wrap it in an array
         ideas = [data];
       }
-      
+
       // Ensure each item has required properties
       const processedIdeas = ideas.map((item, index) => ({
         id: item.id || `idea-${index}`,
@@ -147,7 +131,6 @@ const Index = () => {
         category: item.category || item.productArea,
         url: item.url
       }));
-      
       setResults(processedIdeas);
       toast({
         title: "AI Analysis Complete! 🤖",
@@ -164,14 +147,11 @@ const Index = () => {
       setLoading(false);
     }
   };
-
   const parseCsvToJson = (csvText: string) => {
     const lines = csvText.split('\n').filter(line => line.trim());
     if (lines.length === 0) return [];
-    
     const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
     const data = [];
-    
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(value => value.trim().replace(/"/g, ''));
       if (values.length === headers.length) {
@@ -182,10 +162,8 @@ const Index = () => {
         data.push(row);
       }
     }
-    
     return data;
   };
-
   const handleDoppelganger = async () => {
     if (!csvFile) {
       toast({
@@ -195,14 +173,11 @@ const Index = () => {
       });
       return;
     }
-
     setDoppelgangerLoading(true);
     try {
       const csvText = await csvFile.text();
       const jsonData = parseCsvToJson(csvText);
-      
       console.log('Parsed CSV data:', jsonData);
-      
       const response = await fetch('http://localhost:5678/webhook-test/4698c4cd-b508-441c-a21c-1a3fd39ec2ad', {
         method: 'POST',
         headers: {
@@ -213,17 +188,13 @@ const Index = () => {
           data: jsonData
         })
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       const data = await response.json();
       console.log('Doppelganger response:', data);
-      
       setDoppelgangerDialogOpen(false);
       setCsvFile(null);
-      
       toast({
         title: "AI Doppelgänger Search Complete! 👯",
         description: "Found ideas that look suspiciously familiar."
@@ -239,7 +210,6 @@ const Index = () => {
       setDoppelgangerLoading(false);
     }
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type === 'text/csv') {
@@ -252,12 +222,10 @@ const Index = () => {
       });
     }
   };
-
   const handleUpdateClick = (ideaId: string) => {
     const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
     window.open(url, '_blank');
   };
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -266,11 +234,9 @@ const Index = () => {
       setSortOrder('desc');
     }
   };
-
   const sortedResults = [...results].sort((a, b) => {
     let aValue: any;
     let bValue: any;
-
     if (thinkLonger && sortField === 'classification') {
       aValue = a.classification || '';
       bValue = b.classification || '';
@@ -281,27 +247,22 @@ const Index = () => {
       aValue = a[sortField] || '';
       bValue = b[sortField] || '';
     }
-
     if (typeof aValue === 'number' && typeof bValue === 'number') {
       return sortOrder === 'desc' ? bValue - aValue : aValue - bValue;
     }
-
     const aStr = String(aValue).toLowerCase();
     const bStr = String(bValue).toLowerCase();
-    
     if (sortOrder === 'desc') {
       return bStr.localeCompare(aStr);
     }
     return aStr.localeCompare(bStr);
   });
-
   const getScoreColor = (score: number) => {
     if (score >= 0.7) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 0.6) return 'bg-blue-100 text-blue-700 border-blue-200';
     if (score >= 0.4) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
-
   const getClassificationColor = (classification: string) => {
     switch (classification) {
       case 'Match found':
@@ -314,18 +275,13 @@ const Index = () => {
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
-
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1" />;
     }
-    return sortOrder === 'desc' ? 
-      <ChevronDown className="h-4 w-4 ml-1" /> : 
-      <ChevronUp className="h-4 w-4 ml-1" />;
+    return sortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -347,42 +303,24 @@ const Index = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="Enter URL"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  required
-                  className="flex-1"
-                  disabled={loading}
-                />
+                <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" disabled={loading} />
                 <Button type="submit" disabled={loading}>
                   Submit
                 </Button>
               </div>
               
               {/* Loading display for main form */}
-              {loading && (
-                <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border">
+              {loading && <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border">
                   <Bot className="mr-3 h-5 w-5 animate-bounce text-blue-600" />
                   <span className="text-blue-700 animate-pulse">
                     {funnyLoadingMessages[currentLoadingMessageIndex]}
                   </span>
-                </div>
-              )}
+                </div>}
               
               {/* Think for longer toggle */}
               <div className="flex items-center space-x-2">
-                <Switch
-                  id="think-longer"
-                  checked={thinkLonger}
-                  onCheckedChange={setThinkLonger}
-                  disabled={loading}
-                />
-                <label
-                  htmlFor="think-longer"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
+                <Switch id="think-longer" checked={thinkLonger} onCheckedChange={setThinkLonger} disabled={loading} />
+                <label htmlFor="think-longer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Think for longer
                 </label>
               </div>
@@ -395,65 +333,43 @@ const Index = () => {
           <div className="text-center">
             <Dialog open={doppelgangerDialogOpen} onOpenChange={setDoppelgangerDialogOpen}>
               <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mb-2"
-                  disabled={doppelgangerLoading || loading}
-                >
+                <Button variant="outline" size="sm" className="mb-2" disabled={doppelgangerLoading || loading}>
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Upload CSV for Doppelgänger Analysis</DialogTitle>
+                  <DialogTitle>Find simil</DialogTitle>
                   <DialogDescription>
                     Select a CSV file containing idea data to find suspiciously similar ideas.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Input
-                      type="file"
-                      accept=".csv"
-                      onChange={handleFileChange}
-                      className="flex-1"
-                      disabled={doppelgangerLoading}
-                    />
+                    <Input type="file" accept=".csv" onChange={handleFileChange} className="flex-1" disabled={doppelgangerLoading} />
                     <Upload className="h-4 w-4 text-gray-400" />
                   </div>
-                  {csvFile && (
-                    <p className="text-sm text-gray-600">
+                  {csvFile && <p className="text-sm text-gray-600">
                       Selected: {csvFile.name}
-                    </p>
-                  )}
+                    </p>}
                   
                   {/* Loading display for doppelganger */}
-                  {doppelgangerLoading && (
-                    <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
+                  {doppelgangerLoading && <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
                       <Bot className="mr-3 h-5 w-5 animate-bounce text-purple-600" />
                       <span className="text-purple-700 animate-pulse">
                         {funnyLoadingMessages[currentDoppelgangerMessageIndex]}
                       </span>
-                    </div>
-                  )}
+                    </div>}
                   
                   <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setDoppelgangerDialogOpen(false);
-                        setCsvFile(null);
-                      }}
-                      disabled={doppelgangerLoading}
-                    >
+                    <Button variant="outline" onClick={() => {
+                    setDoppelgangerDialogOpen(false);
+                    setCsvFile(null);
+                  }} disabled={doppelgangerLoading}>
                       Cancel
                     </Button>
-                    <Button
-                      onClick={handleDoppelganger}
-                      disabled={!csvFile || doppelgangerLoading}
-                    >
+                    <Button onClick={handleDoppelganger} disabled={!csvFile || doppelgangerLoading}>
                       Analyze
                     </Button>
                   </div>
@@ -467,8 +383,7 @@ const Index = () => {
         </div>
 
         {/* Results Table */}
-        {results.length > 0 && (
-          <Card>
+        {results.length > 0 && <Card>
             <CardHeader>
               <CardTitle>
                 Ideas Found ({results.length})
@@ -482,55 +397,37 @@ const Index = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead 
-                        className="w-[100px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
-                        onClick={() => handleSort(thinkLonger ? 'classification' : 'score')}
-                      >
+                      <TableHead className="w-[100px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200" onClick={() => handleSort(thinkLonger ? 'classification' : 'score')}>
                         <div className="flex items-center">
                           {thinkLonger ? 'Classification' : 'Score'}
                           {renderSortIcon(thinkLonger ? 'classification' : 'score')}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="w-[120px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
-                        onClick={() => handleSort('idea')}
-                      >
+                      <TableHead className="w-[120px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200" onClick={() => handleSort('idea')}>
                         <div className="flex items-center">
                           Idea ID
                           {renderSortIcon('idea')}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="min-w-[300px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200"
-                        onClick={() => handleSort('content')}
-                      >
+                      <TableHead className="min-w-[300px] bg-blue-100 font-bold cursor-pointer hover:bg-blue-200" onClick={() => handleSort('content')}>
                         <div className="flex items-center">
                           Idea Description
                           {renderSortIcon('content')}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="min-w-[300px] cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('releaseNote')}
-                      >
+                      <TableHead className="min-w-[300px] cursor-pointer hover:bg-gray-50" onClick={() => handleSort('releaseNote')}>
                         <div className="flex items-center">
                           Release Note
                           {renderSortIcon('releaseNote')}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="w-[200px] cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('summary')}
-                      >
+                      <TableHead className="w-[200px] cursor-pointer hover:bg-gray-50" onClick={() => handleSort('summary')}>
                         <div className="flex items-center">
                           Summary
                           {renderSortIcon('summary')}
                         </div>
                       </TableHead>
-                      <TableHead 
-                        className="w-[200px] cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('productArea')}
-                      >
+                      <TableHead className="w-[200px] cursor-pointer hover:bg-gray-50" onClick={() => handleSort('productArea')}>
                         <div className="flex items-center">
                           Product Area
                           {renderSortIcon('productArea')}
@@ -540,21 +437,10 @@ const Index = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedResults.map((idea) => (
-                      <TableRow key={idea.id} className="hover:bg-gray-50">
+                    {sortedResults.map(idea => <TableRow key={idea.id} className="hover:bg-gray-50">
                         <TableCell className="bg-blue-50">
-                          <Badge 
-                            variant="outline" 
-                            className={`font-mono ${
-                              thinkLonger && idea.classification 
-                                ? getClassificationColor(idea.classification)
-                                : getScoreColor(idea.score)
-                            }`}
-                          >
-                            {thinkLonger && idea.classification 
-                              ? idea.classification 
-                              : idea.score.toFixed(3)
-                            }
+                          <Badge variant="outline" className={`font-mono ${thinkLonger && idea.classification ? getClassificationColor(idea.classification) : getScoreColor(idea.score)}`}>
+                            {thinkLonger && idea.classification ? idea.classification : idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium bg-blue-50">
@@ -577,38 +463,27 @@ const Index = () => {
                           <Badge variant="secondary">{idea.productArea}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)} className="text-blue-600 hover:text-blue-800">
                             Go to JIRA
                           </Button>
                         </TableCell>
-                      </TableRow>
-                    ))}
+                      </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && (
-          <Card className="text-center py-12">
+        {!loading && results.length === 0 && <Card className="text-center py-12">
             <CardContent>
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
                 <h3 className="text-lg font-medium text-gray-900">No ideas found yet</h3>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
