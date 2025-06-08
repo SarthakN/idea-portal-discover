@@ -34,7 +34,9 @@ const funnyLoadingMessages = [
   "You wait. I'll pretend to optimize.", 
   "Time is relative. Especially mine.",
   "Trying to look busy so you don't leave.",
-  "Loading... because instant gratification is overrated."
+  "Loading... because instant gratification is overrated.",
+  "Every second you wait, a byte finds meaning.",
+  "Negotiating with the loading gods. They're moody today."
 ];
 
 const Index = () => {
@@ -57,7 +59,7 @@ const Index = () => {
     if (loading) {
       interval = setInterval(() => {
         setCurrentLoadingMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
-      }, 5000);
+      }, 15000);
     }
     return () => {
       if (interval) clearInterval(interval);
