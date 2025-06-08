@@ -25,6 +25,16 @@ interface IdeaResult {
   url?: string;
 }
 
+interface DoppelgangerResult {
+  id_1: string;
+  summary_1: string;
+  text_1: string;
+  id_2: string;
+  summary_2: string;
+  text_2: string;
+  similarity: number;
+}
+
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
 
@@ -42,6 +52,7 @@ const Index = () => {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
   const [currentDoppelgangerMessageIndex, setCurrentDoppelgangerMessageIndex] = useState(0);
+  const [doppelgangerResults, setDoppelgangerResults] = useState<DoppelgangerResult[]>([]);
   const { toast } = useToast();
 
   // Cycle through loading messages every 5 seconds for main loading
@@ -240,11 +251,15 @@ const Index = () => {
       }
       const data = await response.json();
       console.log('Doppelganger response:', data);
+      
+      // Store the doppelganger results
+      setDoppelgangerResults(data);
+      
       setDoppelgangerDialogOpen(false);
       setCsvFile(null);
       toast({
         title: "AI Doppelgänger Search Complete! 👯",
-        description: "Found ideas that look suspiciously familiar."
+        description: `Found ${data.length} idea pairs that look suspiciously familiar.`
       });
     } catch (err) {
       console.error('Error:', err);
@@ -269,6 +284,11 @@ const Index = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleIdeaClick = (ideaId: string) => {
+    const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
+    window.open(url, '_blank');
   };
 
   const handleUpdateClick = (ideaId: string) => {
@@ -472,6 +492,79 @@ const Index = () => {
             </p>
           </div>
         </div>
+
+        {/* Doppelgänger Results Table */}
+        {doppelgangerResults.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                Idea Doppelgängers Found ({doppelgangerResults.length})
+              </CardTitle>
+              <CardDescription>
+                Similar ideas that might be duplicates
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[120px] bg-purple-100 font-bold">ID 1</TableHead>
+                      <TableHead className="min-w-[300px] bg-purple-100 font-bold">Description 1</TableHead>
+                      <TableHead className="w-[120px] bg-purple-100 font-bold">ID 2</TableHead>
+                      <TableHead className="min-w-[300px] bg-purple-100 font-bold">Description 2</TableHead>
+                      <TableHead className="w-[100px] bg-purple-100 font-bold">Similarity</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {doppelgangerResults.map((result, index) => (
+                      <TableRow key={index} className="hover:bg-gray-50">
+                        <TableCell className="bg-purple-50">
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
+                            onClick={() => handleIdeaClick(result.id_1)}
+                          >
+                            {result.id_1}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="bg-purple-50">
+                          <div className="space-y-1">
+                            <p className="font-medium text-sm">{result.summary_1}</p>
+                            <p className="text-sm text-gray-600 whitespace-normal">{result.text_1}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
+                            onClick={() => handleIdeaClick(result.id_2)}
+                          >
+                            {result.id_2}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-medium text-sm">{result.summary_2}</p>
+                            <p className="text-sm text-gray-600 whitespace-normal">{result.text_2}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant="outline" 
+                            className="font-mono bg-yellow-100 text-yellow-800 border-yellow-200"
+                          >
+                            {result.similarity.toFixed(3)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Results Table */}
         {results.length > 0 && (
