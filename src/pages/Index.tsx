@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IdeaResult {
@@ -35,6 +36,8 @@ const Index = () => {
   const [thinkLonger, setThinkLonger] = useState(false);
   const [sortField, setSortField] = useState<SortField>('score');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [doppelgangerDialogOpen, setDoppelgangerDialogOpen] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +78,7 @@ const Index = () => {
         // If response is a single object, wrap it in an array
         ideas = [data];
       }
-
+      
       // Ensure each item has required properties
       const processedIdeas = ideas.map((item, index) => ({
         id: item.id || `idea-${index}`,
@@ -110,24 +113,65 @@ const Index = () => {
     }
   };
 
+  const parseCsvToJson = (csvText: string) => {
+    const lines = csvText.split('\n').filter(line => line.trim());
+    if (lines.length === 0) return [];
+    
+    const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
+    const data = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(value => value.trim().replace(/"/g, ''));
+      if (values.length === headers.length) {
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index];
+        });
+        data.push(row);
+      }
+    }
+    
+    return data;
+  };
+
   const handleDoppelganger = async () => {
+    if (!csvFile) {
+      toast({
+        title: "Error",
+        description: "Please select a CSV file first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setDoppelgangerLoading(true);
     try {
-      // Placeholder webhook call - replace with actual endpoint
+      const csvText = await csvFile.text();
+      const jsonData = parseCsvToJson(csvText);
+      
+      console.log('Parsed CSV data:', jsonData);
+      
       const response = await fetch('http://localhost:5678/webhook/doppelganger-endpoint', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'find_doppelgangers'
+          action: 'find_doppelgangers',
+          data: jsonData
         })
       });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
       console.log('Doppelganger response:', data);
+      
+      setDoppelgangerDialogOpen(false);
+      setCsvFile(null);
+      
       toast({
         title: "AI Doppelgänger Search Complete! 👯",
         description: "Found ideas that look suspiciously familiar."
@@ -141,6 +185,19 @@ const Index = () => {
       });
     } finally {
       setDoppelgangerLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'text/csv') {
+      setCsvFile(file);
+    } else {
+      toast({
+        title: "Error",
+        description: "Please select a valid CSV file.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -279,25 +336,66 @@ const Index = () => {
         {/* Idea Doppelgänger Button */}
         <div className="flex justify-center">
           <div className="text-center">
-            <Button
-              onClick={handleDoppelganger}
-              disabled={doppelgangerLoading}
-              variant="outline"
-              size="sm"
-              className="mb-2"
-            >
-              {doppelgangerLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  AI is searching...
-                </>
-              ) : (
-                <>
+            <Dialog open={doppelgangerDialogOpen} onOpenChange={setDoppelgangerDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mb-2"
+                >
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
-                </>
-              )}
-            </Button>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Upload CSV for Doppelgänger Analysis</DialogTitle>
+                  <DialogDescription>
+                    Select a CSV file containing idea data to find suspiciously similar ideas.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileChange}
+                      className="flex-1"
+                    />
+                    <Upload className="h-4 w-4 text-gray-400" />
+                  </div>
+                  {csvFile && (
+                    <p className="text-sm text-gray-600">
+                      Selected: {csvFile.name}
+                    </p>
+                  )}
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDoppelgangerDialogOpen(false);
+                        setCsvFile(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleDoppelganger}
+                      disabled={!csvFile || doppelgangerLoading}
+                    >
+                      {doppelgangerLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          AI is searching...
+                        </>
+                      ) : (
+                        'Analyze'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <p className="text-sm text-gray-500">
               find ideas that look suspiciously similar
             </p>
