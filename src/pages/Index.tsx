@@ -47,25 +47,46 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [doppelgangerDialogOpen, setDoppelgangerDialogOpen] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [loadingMessage, setLoadingMessage] = useState('');
-  const [doppelgangerLoadingMessage, setDoppelgangerLoadingMessage] = useState('');
+  const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
+  const [currentDoppelgangerMessageIndex, setCurrentDoppelgangerMessageIndex] = useState(0);
   const { toast } = useToast();
 
-  // Get random loading message
-  const getRandomLoadingMessage = () => {
-    return funnyLoadingMessages[Math.floor(Math.random() * funnyLoadingMessages.length)];
-  };
+  // Cycle through loading messages every 5 seconds for main loading
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        setCurrentLoadingMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [loading]);
 
-  // Update loading messages when loading states change
+  // Cycle through loading messages every 5 seconds for doppelganger loading
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (doppelgangerLoading) {
+      interval = setInterval(() => {
+        setCurrentDoppelgangerMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [doppelgangerLoading]);
+
+  // Reset message index when loading starts
   useEffect(() => {
     if (loading) {
-      setLoadingMessage(getRandomLoadingMessage());
+      setCurrentLoadingMessageIndex(0);
     }
   }, [loading]);
 
   useEffect(() => {
     if (doppelgangerLoading) {
-      setDoppelgangerLoadingMessage(getRandomLoadingMessage());
+      setCurrentDoppelgangerMessageIndex(0);
     }
   }, [doppelgangerLoading]);
 
@@ -331,18 +352,22 @@ const Index = () => {
                   onChange={(e) => setUrl(e.target.value)}
                   required
                   className="flex-1"
+                  disabled={loading}
                 />
                 <Button type="submit" disabled={loading}>
-                  {loading ? (
-                    <div className="flex items-center">
-                      <Bot className="mr-2 h-4 w-4 animate-bounce" />
-                      <span className="animate-pulse">{loadingMessage}</span>
-                    </div>
-                  ) : (
-                    'Submit'
-                  )}
+                  Submit
                 </Button>
               </div>
+              
+              {/* Loading display for main form */}
+              {loading && (
+                <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border">
+                  <Bot className="mr-3 h-5 w-5 animate-bounce text-blue-600" />
+                  <span className="text-blue-700 animate-pulse">
+                    {funnyLoadingMessages[currentLoadingMessageIndex]}
+                  </span>
+                </div>
+              )}
               
               {/* Think for longer toggle */}
               <div className="flex items-center space-x-2">
@@ -350,6 +375,7 @@ const Index = () => {
                   id="think-longer"
                   checked={thinkLonger}
                   onCheckedChange={setThinkLonger}
+                  disabled={loading}
                 />
                 <label
                   htmlFor="think-longer"
@@ -371,6 +397,7 @@ const Index = () => {
                   variant="outline"
                   size="sm"
                   className="mb-2"
+                  disabled={doppelgangerLoading || loading}
                 >
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
@@ -390,6 +417,7 @@ const Index = () => {
                       accept=".csv"
                       onChange={handleFileChange}
                       className="flex-1"
+                      disabled={doppelgangerLoading}
                     />
                     <Upload className="h-4 w-4 text-gray-400" />
                   </div>
@@ -398,6 +426,17 @@ const Index = () => {
                       Selected: {csvFile.name}
                     </p>
                   )}
+                  
+                  {/* Loading display for doppelganger */}
+                  {doppelgangerLoading && (
+                    <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
+                      <Bot className="mr-3 h-5 w-5 animate-bounce text-purple-600" />
+                      <span className="text-purple-700 animate-pulse">
+                        {funnyLoadingMessages[currentDoppelgangerMessageIndex]}
+                      </span>
+                    </div>
+                  )}
+                  
                   <div className="flex justify-end gap-2">
                     <Button
                       variant="outline"
@@ -405,6 +444,7 @@ const Index = () => {
                         setDoppelgangerDialogOpen(false);
                         setCsvFile(null);
                       }}
+                      disabled={doppelgangerLoading}
                     >
                       Cancel
                     </Button>
@@ -412,14 +452,7 @@ const Index = () => {
                       onClick={handleDoppelganger}
                       disabled={!csvFile || doppelgangerLoading}
                     >
-                      {doppelgangerLoading ? (
-                        <div className="flex items-center">
-                          <Bot className="mr-2 h-4 w-4 animate-bounce" />
-                          <span className="animate-pulse">{doppelgangerLoadingMessage}</span>
-                        </div>
-                      ) : (
-                        'Analyze'
-                      )}
+                      Analyze
                     </Button>
                   </div>
                 </div>
