@@ -60,6 +60,9 @@ const Index = () => {
     let interval: NodeJS.Timeout;
     if (doppelgangerLoading) {
       interval = setInterval(() => {
+        setCurrentDoppelgangerMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+      }, 15000);
+=======
         setCurrentDoppelgangerMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
       }, 5000);
     }
