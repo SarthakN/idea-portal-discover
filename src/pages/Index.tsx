@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,15 @@ interface IdeaResult {
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
 
+const funnyLoadingMessages = [
+  "Go grab a coffee… or make one for me too?",
+  "Still faster than airport Wi-Fi.",
+  "You wait. I'll pretend to optimize.", 
+  "Time is relative. Especially mine.",
+  "Trying to look busy so you don't leave.",
+  "Loading... because instant gratification is overrated."
+];
+
 const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
@@ -38,7 +47,27 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [doppelgangerDialogOpen, setDoppelgangerDialogOpen] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [doppelgangerLoadingMessage, setDoppelgangerLoadingMessage] = useState('');
   const { toast } = useToast();
+
+  // Get random loading message
+  const getRandomLoadingMessage = () => {
+    return funnyLoadingMessages[Math.floor(Math.random() * funnyLoadingMessages.length)];
+  };
+
+  // Update loading messages when loading states change
+  useEffect(() => {
+    if (loading) {
+      setLoadingMessage(getRandomLoadingMessage());
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (doppelgangerLoading) {
+      setDoppelgangerLoadingMessage(getRandomLoadingMessage());
+    }
+  }, [doppelgangerLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,10 +334,10 @@ const Index = () => {
                 />
                 <Button type="submit" disabled={loading}>
                   {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      AI is thinking...
-                    </>
+                    <div className="flex items-center">
+                      <Bot className="mr-2 h-4 w-4 animate-bounce" />
+                      <span className="animate-pulse">{loadingMessage}</span>
+                    </div>
                   ) : (
                     'Submit'
                   )}
@@ -384,10 +413,10 @@ const Index = () => {
                       disabled={!csvFile || doppelgangerLoading}
                     >
                       {doppelgangerLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          AI is searching...
-                        </>
+                        <div className="flex items-center">
+                          <Bot className="mr-2 h-4 w-4 animate-bounce" />
+                          <span className="animate-pulse">{doppelgangerLoadingMessage}</span>
+                        </div>
                       ) : (
                         'Analyze'
                       )}
