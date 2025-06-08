@@ -340,10 +340,8 @@ const Index = () => {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Find simil</DialogTitle>
-                  <DialogDescription>
-                    Select a CSV file containing idea data to find suspiciously similar ideas.
-                  </DialogDescription>
+                  <DialogTitle>Find duplicate ideas</DialogTitle>
+                  <DialogDescription>Upload CSV file with ideas</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
