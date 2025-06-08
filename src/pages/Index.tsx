@@ -60,6 +60,9 @@ const Index = () => {
     let interval: NodeJS.Timeout;
     if (doppelgangerLoading) {
       interval = setInterval(() => {
+        setCurrentDoppelgangerMessageIndex((prev) => (prev + 1) % funnyLoadingMessages.length);
+      }, 15000);
+=======
         setCurrentDoppelgangerMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
       }, 5000);
     }
@@ -175,6 +178,9 @@ const Index = () => {
     }
     setDoppelgangerLoading(true);
     try {
+      const csvText = await csvFile.text();
+      const jsonData = parseCsvToJson(csvText);
+      console.log('Parsed CSV data:', jsonData);
       const response = await fetch('http://localhost:5678/webhook-test/4698c4cd-b508-441c-a21c-1a3fd39ec2ad', {
         method: 'POST',
         headers: {
@@ -182,7 +188,7 @@ const Index = () => {
         },
         body: JSON.stringify({
           action: 'find_doppelgangers',
-          filePath: csvFile.name
+          data: jsonData
         })
       });
       if (!response.ok) {
