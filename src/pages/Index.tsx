@@ -196,6 +196,7 @@ const Index = () => {
   if (currentField || currentRow.length) {
     currentRow.push(currentField);
     rows.push(currentRow);
+    console.log(currentRow);
   }
 
   const headers = rows[0];
