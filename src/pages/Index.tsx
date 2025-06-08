@@ -151,7 +151,7 @@ const Index = () => {
       
       console.log('Parsed CSV data:', jsonData);
       
-      const response = await fetch('http://localhost:5678/webhook/doppelganger-endpoint', {
+      const response = await fetch('http://localhost:5678/webhook-test/4698c4cd-b508-441c-a21c-1a3fd39ec2ad', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
