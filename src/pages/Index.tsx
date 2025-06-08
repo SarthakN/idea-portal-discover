@@ -152,23 +152,63 @@ const Index = () => {
     }
   };
 
-  const parseCsvToJson = (csvText: string) => {
-    const lines = csvText.split('\n').filter(line => line.trim());
-    if (lines.length === 0) return [];
-    const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
-    const data = [];
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(value => value.trim().replace(/"/g, ''));
-      if (values.length === headers.length) {
-        const row: any = {};
-        headers.forEach((header, index) => {
-          row[header] = values[index];
-        });
-        data.push(row);
+  const parseCsvToJson = (csvText) => {
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < csvText.length) {
+    const char = csvText[i];
+    const nextChar = csvText[i + 1];
+
+    if (inQuotes) {
+      if (char === '"' && nextChar === '"') {
+        currentField += '"';
+        i += 1;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        currentField += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ',') {
+        currentRow.push(currentField);
+        currentField = '';
+      } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
+        currentRow.push(currentField);
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+        if (char === '\r' && nextChar === '\n') i += 1;
+      } else {
+        currentField += char;
       }
     }
-    return data;
-  };
+
+    i += 1;
+  }
+
+  // Add last row
+  if (currentField || currentRow.length) {
+    currentRow.push(currentField);
+    rows.push(currentRow);
+  }
+
+  const headers = rows[0];
+  const data = rows.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header.trim()] = row[index]?.trim();
+    });
+    return obj;
+  });
+
+  return data;
+};
 
   const handleDoppelganger = async () => {
     if (!csvFile) {
