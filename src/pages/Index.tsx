@@ -8,7 +8,6 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -24,7 +23,6 @@ interface IdeaResult {
   category?: string;
   url?: string;
 }
-
 interface DoppelgangerResult {
   id_1: string;
   summary_1: string;
@@ -34,12 +32,9 @@ interface DoppelgangerResult {
   text_2: string;
   similarity: number;
 }
-
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
-
 const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
-
 const Index = () => {
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
@@ -53,7 +48,9 @@ const Index = () => {
   const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
   const [currentDoppelgangerMessageIndex, setCurrentDoppelgangerMessageIndex] = useState(0);
   const [doppelgangerResults, setDoppelgangerResults] = useState<DoppelgangerResult[]>([]);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
 
   // Cycle through loading messages every 5 seconds for main loading
   useEffect(() => {
@@ -87,13 +84,11 @@ const Index = () => {
       setCurrentLoadingMessageIndex(0);
     }
   }, [loading]);
-
   useEffect(() => {
     if (doppelgangerLoading) {
       setCurrentDoppelgangerMessageIndex(0);
     }
   }, [doppelgangerLoading]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
@@ -162,66 +157,59 @@ const Index = () => {
       setLoading(false);
     }
   };
-
-  const parseCsvToJson = (csvText) => {
-  const rows = [];
-  let currentRow = [];
-  let currentField = '';
-  let inQuotes = false;
-  let i = 0;
-
-  while (i < csvText.length) {
-    const char = csvText[i];
-    const nextChar = csvText[i + 1];
-
-    if (inQuotes) {
-      if (char === '"' && nextChar === '"') {
-        currentField += '"';
-        i += 1;
-      } else if (char === '"') {
-        inQuotes = false;
+  const parseCsvToJson = csvText => {
+    const rows = [];
+    let currentRow = [];
+    let currentField = '';
+    let inQuotes = false;
+    let i = 0;
+    while (i < csvText.length) {
+      const char = csvText[i];
+      const nextChar = csvText[i + 1];
+      if (inQuotes) {
+        if (char === '"' && nextChar === '"') {
+          currentField += '"';
+          i += 1;
+        } else if (char === '"') {
+          inQuotes = false;
+        } else {
+          currentField += char;
+        }
       } else {
-        currentField += char;
+        if (char === '"') {
+          inQuotes = true;
+        } else if (char === ',') {
+          currentRow.push(currentField);
+          currentField = '';
+        } else if (char === '\n' || char === '\r' && nextChar === '\n') {
+          currentRow.push(currentField);
+          rows.push(currentRow);
+          currentRow = [];
+          currentField = '';
+          if (char === '\r' && nextChar === '\n') i += 1;
+        } else {
+          currentField += char;
+        }
       }
-    } else {
-      if (char === '"') {
-        inQuotes = true;
-      } else if (char === ',') {
-        currentRow.push(currentField);
-        currentField = '';
-      } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-        currentRow.push(currentField);
-        rows.push(currentRow);
-        currentRow = [];
-        currentField = '';
-        if (char === '\r' && nextChar === '\n') i += 1;
-      } else {
-        currentField += char;
-      }
+      i += 1;
     }
 
-    i += 1;
-  }
-
-  // Add last row
-  if (currentField || currentRow.length) {
-    currentRow.push(currentField);
-    rows.push(currentRow);
-    console.log(currentRow);
-  }
-
-  const headers = rows[0];
-  const data = rows.slice(1).map(row => {
-    const obj = {};
-    headers.forEach((header, index) => {
-      obj[header.trim()] = row[index]?.trim();
+    // Add last row
+    if (currentField || currentRow.length) {
+      currentRow.push(currentField);
+      rows.push(currentRow);
+      console.log(currentRow);
+    }
+    const headers = rows[0];
+    const data = rows.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((header, index) => {
+        obj[header.trim()] = row[index]?.trim();
+      });
+      return obj;
     });
-    return obj;
-  });
-
-  return data;
-};
-
+    return data;
+  };
   const handleDoppelganger = async () => {
     if (!csvFile) {
       toast({
@@ -251,10 +239,9 @@ const Index = () => {
       }
       const data = await response.json();
       console.log('Doppelganger response:', data);
-      
+
       // Store the doppelganger results
       setDoppelgangerResults(data);
-      
       setDoppelgangerDialogOpen(false);
       setCsvFile(null);
       toast({
@@ -272,7 +259,6 @@ const Index = () => {
       setDoppelgangerLoading(false);
     }
   };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type === 'text/csv') {
@@ -285,17 +271,14 @@ const Index = () => {
       });
     }
   };
-
   const handleIdeaClick = (ideaId: string) => {
     const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
     window.open(url, '_blank');
   };
-
   const handleUpdateClick = (ideaId: string) => {
     const url = `https://powerschoolgroup.atlassian.net/browse/${ideaId}`;
     window.open(url, '_blank');
   };
-
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -304,7 +287,6 @@ const Index = () => {
       setSortOrder('desc');
     }
   };
-
   const sortedResults = [...results].sort((a, b) => {
     let aValue: any;
     let bValue: any;
@@ -328,14 +310,12 @@ const Index = () => {
     }
     return aStr.localeCompare(bStr);
   });
-
   const getScoreColor = (score: number) => {
     if (score >= 0.7) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 0.6) return 'bg-blue-100 text-blue-700 border-blue-200';
     if (score >= 0.4) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     return 'bg-red-100 text-red-800 border-red-200';
   };
-
   const getClassificationColor = (classification: string) => {
     switch (classification) {
       case 'Match found':
@@ -348,20 +328,17 @@ const Index = () => {
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
-
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1" />;
     }
     return sortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-400">Not a bad <strong>IDEA</strong> 😏</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Not a bad <strong>IDEA</strong> 😏</h1>
           <p className="text-lg text-gray-600">One person's wild idea is another's Jira ticket.</p>
         </div>
 
@@ -379,15 +356,7 @@ const Index = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-2">
-                <Input 
-                  type="url" 
-                  placeholder="Enter URL" 
-                  value={url} 
-                  onChange={e => setUrl(e.target.value)} 
-                  required 
-                  className="flex-1" 
-                  disabled={loading} 
-                />
+                <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" disabled={loading} />
                 <Button type="submit" disabled={loading}>
                   Submit
                 </Button>
@@ -395,12 +364,7 @@ const Index = () => {
               
               {/* Think for longer toggle */}
               <div className="flex items-center space-x-2">
-                <Switch 
-                  id="think-longer" 
-                  checked={thinkLonger} 
-                  onCheckedChange={setThinkLonger} 
-                  disabled={loading} 
-                />
+                <Switch id="think-longer" checked={thinkLonger} onCheckedChange={setThinkLonger} disabled={loading} />
                 <label htmlFor="think-longer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Think for longer
                 </label>
@@ -408,14 +372,12 @@ const Index = () => {
             </form>
             
             {/* Loading display for main form */}
-            {loading && (
-              <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border mt-4">
+            {loading && <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border mt-4">
                 <Bot className="mr-3 h-5 w-5 animate-bounce text-blue-600" />
                 <span className="text-blue-700 animate-pulse">
                   {funnyLoadingMessages[currentLoadingMessageIndex]}
                 </span>
-              </div>
-            )}
+              </div>}
           </CardContent>
         </Card>
 
@@ -424,12 +386,7 @@ const Index = () => {
           <div className="text-center">
             <Dialog open={doppelgangerDialogOpen} onOpenChange={setDoppelgangerDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mb-2" 
-                  disabled={doppelgangerLoading || loading}
-                >
+                <Button variant="outline" size="sm" className="mb-2" disabled={doppelgangerLoading || loading}>
                   <Bot className="mr-2 h-4 w-4" />
                   Idea Doppelgänger
                 </Button>
@@ -441,50 +398,33 @@ const Index = () => {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Input 
-                      type="file" 
-                      accept=".csv" 
-                      onChange={handleFileChange} 
-                      className="flex-1" 
-                      disabled={doppelgangerLoading} 
-                    />
+                    <Input type="file" accept=".csv" onChange={handleFileChange} className="flex-1" disabled={doppelgangerLoading} />
                     <Upload className="h-4 w-4 text-gray-400" />
                   </div>
-                  {csvFile && (
-                    <p className="text-sm text-gray-600">
+                  {csvFile && <p className="text-sm text-gray-600">
                       Selected: {csvFile.name}
-                    </p>
-                  )}
+                    </p>}
                   
                   <div className="flex justify-end gap-2">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setDoppelgangerDialogOpen(false);
-                        setCsvFile(null);
-                      }} 
-                      disabled={doppelgangerLoading}
-                    >
+                    <Button variant="outline" onClick={() => {
+                    setDoppelgangerDialogOpen(false);
+                    setCsvFile(null);
+                  }} disabled={doppelgangerLoading}>
                       Cancel
                     </Button>
-                    <Button 
-                      onClick={handleDoppelganger} 
-                      disabled={!csvFile || doppelgangerLoading}
-                    >
+                    <Button onClick={handleDoppelganger} disabled={!csvFile || doppelgangerLoading}>
                       Analyze
                     </Button>
                   </div>
                 </div>
                 
                 {/* Loading display for doppelganger */}
-                {doppelgangerLoading && (
-                  <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
+                {doppelgangerLoading && <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
                     <Bot className="mr-3 h-5 w-5 animate-bounce text-purple-600" />
                     <span className="text-purple-700 animate-pulse">
                       {funnyLoadingMessages[currentDoppelgangerMessageIndex]}
                     </span>
-                  </div>
-                )}
+                  </div>}
               </DialogContent>
             </Dialog>
             <p className="text-sm text-gray-500">
@@ -494,8 +434,7 @@ const Index = () => {
         </div>
 
         {/* Doppelgänger Results Table */}
-        {doppelgangerResults.length > 0 && (
-          <Card>
+        {doppelgangerResults.length > 0 && <Card>
             <CardHeader>
               <CardTitle>
                 Idea Doppelgängers Found ({doppelgangerResults.length})
@@ -517,14 +456,9 @@ const Index = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {doppelgangerResults.map((result, index) => (
-                      <TableRow key={index} className="hover:bg-gray-50">
+                    {doppelgangerResults.map((result, index) => <TableRow key={index} className="hover:bg-gray-50">
                         <TableCell className="bg-purple-50">
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
-                            onClick={() => handleIdeaClick(result.id_1)}
-                          >
+                          <Button variant="link" className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800" onClick={() => handleIdeaClick(result.id_1)}>
                             {result.id_1}
                           </Button>
                         </TableCell>
@@ -535,11 +469,7 @@ const Index = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
-                            onClick={() => handleIdeaClick(result.id_2)}
-                          >
+                          <Button variant="link" className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800" onClick={() => handleIdeaClick(result.id_2)}>
                             {result.id_2}
                           </Button>
                         </TableCell>
@@ -550,25 +480,19 @@ const Index = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge 
-                            variant="outline" 
-                            className="font-mono bg-yellow-100 text-yellow-800 border-yellow-200"
-                          >
+                          <Badge variant="outline" className="font-mono bg-yellow-100 text-yellow-800 border-yellow-200">
                             {result.similarity.toFixed(3)}
                           </Badge>
                         </TableCell>
-                      </TableRow>
-                    ))}
+                      </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Results Table */}
-        {results.length > 0 && (
-          <Card>
+        {results.length > 0 && <Card>
             <CardHeader>
               <CardTitle>
                 Ideas Found ({results.length})
@@ -622,13 +546,9 @@ const Index = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedResults.map(idea => (
-                      <TableRow key={idea.id} className="hover:bg-gray-50">
+                    {sortedResults.map(idea => <TableRow key={idea.id} className="hover:bg-gray-50">
                         <TableCell className="bg-blue-50">
-                          <Badge 
-                            variant="outline" 
-                            className={`font-mono ${thinkLonger && idea.classification ? getClassificationColor(idea.classification) : getScoreColor(idea.score)}`}
-                          >
+                          <Badge variant="outline" className={`font-mono ${thinkLonger && idea.classification ? getClassificationColor(idea.classification) : getScoreColor(idea.score)}`}>
                             {thinkLonger && idea.classification ? idea.classification : idea.score.toFixed(3)}
                           </Badge>
                         </TableCell>
@@ -652,38 +572,27 @@ const Index = () => {
                           <Badge variant="secondary">{idea.productArea}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)} 
-                            className="text-blue-600 hover:text-blue-800"
-                          >
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateClick(idea.idea || `IDEA-${idea.id}`)} className="text-blue-600 hover:text-blue-800">
                             Go to JIRA
                           </Button>
                         </TableCell>
-                      </TableRow>
-                    ))}
+                      </TableRow>)}
                   </TableBody>
                 </Table>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && (
-          <Card className="text-center py-12">
+        {!loading && results.length === 0 && <Card className="text-center py-12">
             <CardContent>
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
                 <h3 className="text-lg font-medium text-gray-900">No ideas found yet</h3>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
