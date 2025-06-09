@@ -361,7 +361,7 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900">Not a bad <strong>IDEA</strong> 😏</h1>
+          <h1 className="text-4xl font-bold text-gray-400">Not a bad <strong>IDEA</strong> 😏</h1>
           <p className="text-lg text-gray-600">One person's wild idea is another's Jira ticket.</p>
         </div>
 
