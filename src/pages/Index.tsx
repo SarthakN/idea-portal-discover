@@ -58,7 +58,7 @@ const Index = () => {
     if (loading) {
       interval = setInterval(() => {
         setCurrentLoadingMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
-      }, 5000);
+      }, 10000);
     }
     return () => {
       if (interval) clearInterval(interval);
@@ -71,7 +71,7 @@ const Index = () => {
     if (doppelgangerLoading) {
       interval = setInterval(() => {
         setCurrentDoppelgangerMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
-      }, 5000);
+      }, 10000);
     }
     return () => {
       if (interval) clearInterval(interval);
