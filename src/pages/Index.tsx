@@ -57,7 +57,7 @@ const Index = () => {
     let interval: NodeJS.Timeout;
     if (loading) {
       interval = setInterval(() => {
-        setCurrentLoadingMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
+        setCurrentLoadingMessageIndex(() => Math.floor(Math.random() * funnyLoadingMessages.length));
       }, 10000);
     }
     return () => {
@@ -70,7 +70,7 @@ const Index = () => {
     let interval: NodeJS.Timeout;
     if (doppelgangerLoading) {
       interval = setInterval(() => {
-        setCurrentDoppelgangerMessageIndex(prev => (prev + 1) % funnyLoadingMessages.length);
+        setCurrentDoppelgangerMessageIndex(() => Math.floor(Math.random() * funnyLoadingMessages.length));
       }, 10000);
     }
     return () => {
