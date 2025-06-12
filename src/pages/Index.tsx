@@ -428,7 +428,7 @@ const Index = () => {
               </DialogContent>
             </Dialog>
             <p className="text-sm text-gray-500">
-              find ideas that look suspiciously similar 🧐
+              find ideas that look suspiciously similar
             </p>
           </div>
         </div>
