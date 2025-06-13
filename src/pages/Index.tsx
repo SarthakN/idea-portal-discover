@@ -347,7 +347,7 @@ const Index = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              Find matching ideas
+              Release matcher
             </CardTitle>
             <CardDescription className="font-thin text-xs">
               Enter release notes URL (e.g. https://ut.powerschool-docs.com/app-tracking-employer/latest/release-25-3-1-0-march-2025)
