@@ -599,7 +599,7 @@ const Index = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>
-                    Financial Results ({moneyResults.length})
+                    Results ({moneyResults.length})
                   </CardTitle>
                   <CardDescription>
                     Ideas with potential financial impact
