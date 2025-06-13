@@ -35,7 +35,6 @@ interface DoppelgangerResult {
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
 type ActiveCard = 'release-matcher' | 'idea-doppelganger' | 'show-money' | null;
-
 const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
 const Index = () => {
   const [activeCard, setActiveCard] = useState<ActiveCard>(null);
@@ -346,53 +345,28 @@ const Index = () => {
         </div>
 
         {/* Main Action Buttons */}
-        {!activeCard && (
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Button 
-              size="lg" 
-              className="flex items-center gap-2"
-              onClick={() => setActiveCard('release-matcher')}
-            >
+        {!activeCard && <div className="flex justify-center gap-4 flex-wrap">
+            <Button size="lg" className="flex items-center gap-2" onClick={() => setActiveCard('release-matcher')}>
               <Search className="h-5 w-5" />
               Release Matcher
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => setActiveCard('idea-doppelganger')}
-            >
+            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('idea-doppelganger')}>
               <Bot className="h-5 w-5" />
               Idea Doppelgänger
             </Button>
-            <Button 
-              size="lg" 
-              variant="secondary"
-              className="flex items-center gap-2"
-              onClick={() => setActiveCard('show-money')}
-            >
+            <Button size="lg" variant="secondary" className="flex items-center gap-2" onClick={() => setActiveCard('show-money')}>
               <DollarSign className="h-5 w-5" />
               Show Me The Money
             </Button>
-          </div>
-        )}
+          </div>}
 
         {/* Back Button */}
-        {activeCard && (
-          <div className="flex justify-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveCard(null)}
-              className="mb-4"
-            >
-              ← Back to Menu
-            </Button>
-          </div>
-        )}
+        {activeCard && <div className="flex justify-center">
+            <Button variant="ghost" onClick={() => setActiveCard(null)} className="mb-4">← Go Back</Button>
+          </div>}
 
         {/* Release Matcher Card */}
-        {activeCard === 'release-matcher' && (
-          <Card className="w-full max-w-2xl mx-auto">
+        {activeCard === 'release-matcher' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
@@ -428,12 +402,10 @@ const Index = () => {
                   </span>
                 </div>}
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Idea Doppelgänger Card */}
-        {activeCard === 'idea-doppelganger' && (
-          <Card className="w-full max-w-2xl mx-auto">
+        {activeCard === 'idea-doppelganger' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bot className="h-5 w-5" />
@@ -466,12 +438,10 @@ const Index = () => {
                   </div>}
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Show Me The Money Card */}
-        {activeCard === 'show-money' && (
-          <Card className="w-full max-w-2xl mx-auto">
+        {activeCard === 'show-money' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
@@ -487,8 +457,7 @@ const Index = () => {
                 <p className="text-gray-600">This feature is under development</p>
               </div>
             </CardContent>
-          </Card>
-        )}
+          </Card>}
 
         {/* Doppelgänger Results Table */}
         {doppelgangerResults.length > 0 && <Card>
