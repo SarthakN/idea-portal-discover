@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload } from "lucide-react";
+import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 interface IdeaResult {
   id: string | number;
@@ -34,8 +34,11 @@ interface DoppelgangerResult {
 }
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
+type ActiveCard = 'release-matcher' | 'idea-doppelganger' | 'show-money' | null;
+
 const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
 const Index = () => {
+  const [activeCard, setActiveCard] = useState<ActiveCard>(null);
   const [url, setUrl] = useState('');
   const [results, setResults] = useState<IdeaResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -342,81 +345,117 @@ const Index = () => {
           <p className="text-lg text-gray-600">One person's wild idea is another's Jira ticket.</p>
         </div>
 
-        {/* Input Form */}
-        <Card className="w-full max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        {/* Main Action Buttons */}
+        {!activeCard && (
+          <div className="flex justify-center gap-4 flex-wrap">
+            <Button 
+              size="lg" 
+              className="flex items-center gap-2"
+              onClick={() => setActiveCard('release-matcher')}
+            >
               <Search className="h-5 w-5" />
-              Release matcher
-            </CardTitle>
-            <CardDescription className="font-thin text-xs">
-              Enter release notes URL (e.g. https://ut.powerschool-docs.com/app-tracking-employer/latest/release-25-3-1-0-march-2025)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex gap-2">
-                <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" disabled={loading} />
-                <Button type="submit" disabled={loading}>
-                  Submit
-                </Button>
-              </div>
-              
-              {/* Think for longer toggle */}
-              <div className="flex items-center space-x-2">
-                <Switch id="think-longer" checked={thinkLonger} onCheckedChange={setThinkLonger} disabled={loading} />
-                <label htmlFor="think-longer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Think for longer
-                </label>
-              </div>
-            </form>
-            
-            {/* Loading display for main form */}
-            {loading && <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border mt-4">
-                <Bot className="mr-3 h-5 w-5 animate-bounce text-blue-600" />
-                <span className="text-blue-700 animate-pulse">
-                  {funnyLoadingMessages[currentLoadingMessageIndex]}
-                </span>
-              </div>}
-          </CardContent>
-        </Card>
+              Release Matcher
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => setActiveCard('idea-doppelganger')}
+            >
+              <Bot className="h-5 w-5" />
+              Idea Doppelgänger
+            </Button>
+            <Button 
+              size="lg" 
+              variant="secondary"
+              className="flex items-center gap-2"
+              onClick={() => setActiveCard('show-money')}
+            >
+              <DollarSign className="h-5 w-5" />
+              Show Me The Money
+            </Button>
+          </div>
+        )}
 
-        {/* Idea Doppelgänger Button */}
-        <div className="flex justify-center">
-          <div className="text-center">
-            <Dialog open={doppelgangerDialogOpen} onOpenChange={setDoppelgangerDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="mb-2" disabled={doppelgangerLoading || loading}>
-                  <Bot className="mr-2 h-4 w-4" />
-                  Idea Doppelgänger
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Find duplicate ideas</DialogTitle>
-                  <DialogDescription>Upload CSV file with ideas</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Input type="file" accept=".csv" onChange={handleFileChange} className="flex-1" disabled={doppelgangerLoading} />
-                    <Upload className="h-4 w-4 text-gray-400" />
-                  </div>
-                  {csvFile && <p className="text-sm text-gray-600">
-                      Selected: {csvFile.name}
-                    </p>}
-                  
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => {
-                    setDoppelgangerDialogOpen(false);
-                    setCsvFile(null);
-                  }} disabled={doppelgangerLoading}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleDoppelganger} disabled={!csvFile || doppelgangerLoading}>
-                      Analyze
-                    </Button>
-                  </div>
+        {/* Back Button */}
+        {activeCard && (
+          <div className="flex justify-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => setActiveCard(null)}
+              className="mb-4"
+            >
+              ← Back to Menu
+            </Button>
+          </div>
+        )}
+
+        {/* Release Matcher Card */}
+        {activeCard === 'release-matcher' && (
+          <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Release matcher
+              </CardTitle>
+              <CardDescription className="font-thin text-xs">
+                Enter release notes URL (e.g. https://ut.powerschool-docs.com/app-tracking-employer/latest/release-25-3-1-0-march-2025)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex gap-2">
+                  <Input type="url" placeholder="Enter URL" value={url} onChange={e => setUrl(e.target.value)} required className="flex-1" disabled={loading} />
+                  <Button type="submit" disabled={loading}>
+                    Submit
+                  </Button>
                 </div>
+                
+                {/* Think for longer toggle */}
+                <div className="flex items-center space-x-2">
+                  <Switch id="think-longer" checked={thinkLonger} onCheckedChange={setThinkLonger} disabled={loading} />
+                  <label htmlFor="think-longer" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Think for longer
+                  </label>
+                </div>
+              </form>
+              
+              {/* Loading display for main form */}
+              {loading && <div className="flex items-center justify-center p-4 bg-blue-50 rounded-lg border mt-4">
+                  <Bot className="mr-3 h-5 w-5 animate-bounce text-blue-600" />
+                  <span className="text-blue-700 animate-pulse">
+                    {funnyLoadingMessages[currentLoadingMessageIndex]}
+                  </span>
+                </div>}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Idea Doppelgänger Card */}
+        {activeCard === 'idea-doppelganger' && (
+          <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                Idea Doppelgänger
+              </CardTitle>
+              <CardDescription>
+                Upload CSV file to find ideas that look suspiciously similar
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Input type="file" accept=".csv" onChange={handleFileChange} className="flex-1" disabled={doppelgangerLoading} />
+                  <Upload className="h-4 w-4 text-gray-400" />
+                </div>
+                {csvFile && <p className="text-sm text-gray-600">
+                    Selected: {csvFile.name}
+                  </p>}
+                
+                <Button onClick={handleDoppelganger} disabled={!csvFile || doppelgangerLoading} className="w-full">
+                  Analyze for Duplicates
+                </Button>
                 
                 {/* Loading display for doppelganger */}
                 {doppelgangerLoading && <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg border">
@@ -425,13 +464,31 @@ const Index = () => {
                       {funnyLoadingMessages[currentDoppelgangerMessageIndex]}
                     </span>
                   </div>}
-              </DialogContent>
-            </Dialog>
-            <p className="text-sm text-gray-500">
-              find ideas that look suspiciously similar
-            </p>
-          </div>
-        </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Show Me The Money Card */}
+        {activeCard === 'show-money' && (
+          <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Show Me The Money
+              </CardTitle>
+              <CardDescription>
+                Coming soon - Financial insights and analytics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">This feature is under development</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Doppelgänger Results Table */}
         {doppelgangerResults.length > 0 && <Card>
@@ -584,7 +641,7 @@ const Index = () => {
           </Card>}
 
         {/* Empty State */}
-        {!loading && results.length === 0 && <Card className="text-center py-12">
+        {!loading && results.length === 0 && activeCard === 'release-matcher' && <Card className="text-center py-12">
             <CardContent>
               <div className="space-y-2">
                 <Search className="h-12 w-12 text-gray-400 mx-auto" />
