@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -32,6 +33,22 @@ interface DoppelgangerResult {
   text_2: string;
   similarity: number;
 }
+interface MoneyResult {
+  id: string;
+  total_arr: number;
+  votes: string;
+  document: {
+    pageContent: string;
+    metadata: {
+      ID: string;
+      blobType: string;
+      "loc.lines.from": number;
+      "loc.lines.to": number;
+      source: string;
+    };
+  };
+  score: number;
+}
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
 type ActiveCard = 'release-matcher' | 'idea-doppelganger' | 'show-money' | null;
@@ -50,6 +67,11 @@ const Index = () => {
   const [currentLoadingMessageIndex, setCurrentLoadingMessageIndex] = useState(0);
   const [currentDoppelgangerMessageIndex, setCurrentDoppelgangerMessageIndex] = useState(0);
   const [doppelgangerResults, setDoppelgangerResults] = useState<DoppelgangerResult[]>([]);
+  const [moneyKeyword, setMoneyKeyword] = useState('');
+  const [moneyResults, setMoneyResults] = useState<MoneyResult[]>([]);
+  const [moneyLoading, setMoneyLoading] = useState(false);
+  const [moneySortField, setMoneySortField] = useState<MoneySortField>('score');
+  const [moneySortOrder, setMoneySortOrder] = useState<SortOrder>('desc');
   const {
     toast
   } = useToast();
@@ -336,6 +358,90 @@ const Index = () => {
     }
     return sortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
+
+  const handleMoneySearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!moneyKeyword.trim()) return;
+    
+    setMoneyLoading(true);
+    try {
+      const response = await fetch('http://localhost:5678/webhook-test/22b83529-18a6-4bf9-99f9-bab4475f1a0a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          keyword: moneyKeyword
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Money search response:', data);
+      
+      setMoneyResults(Array.isArray(data) ? data : []);
+      toast({
+        title: "Search Complete! 💰",
+        description: `Found ${Array.isArray(data) ? data.length : 0} results for "${moneyKeyword}"`
+      });
+    } catch (err) {
+      console.error('Error:', err);
+      toast({
+        title: "Error",
+        description: "Failed to search. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setMoneyLoading(false);
+    }
+  };
+
+  const handleMoneySort = (field: MoneySortField) => {
+    if (moneySortField === field) {
+      setMoneySortOrder(moneySortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setMoneySortField(field);
+      setMoneySortOrder('desc');
+    }
+  };
+
+  const sortedMoneyResults = [...moneyResults].sort((a, b) => {
+    let aValue: any;
+    let bValue: any;
+    
+    if (moneySortField === 'score') {
+      aValue = a.score;
+      bValue = b.score;
+    } else if (moneySortField === 'total_arr') {
+      aValue = a.total_arr;
+      bValue = b.total_arr;
+    } else if (moneySortField === 'votes') {
+      aValue = parseInt(a.votes) || 0;
+      bValue = parseInt(b.votes) || 0;
+    }
+    
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return moneySortOrder === 'desc' ? bValue - aValue : aValue - bValue;
+    }
+    
+    const aStr = String(aValue).toLowerCase();
+    const bStr = String(bValue).toLowerCase();
+    if (moneySortOrder === 'desc') {
+      return bStr.localeCompare(aStr);
+    }
+    return aStr.localeCompare(bStr);
+  });
+
+  const renderMoneySortIcon = (field: MoneySortField) => {
+    if (moneySortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1" />;
+    }
+    return moneySortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
+  };
+
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
@@ -448,13 +554,111 @@ const Index = () => {
                 Show Me The Money
               </CardTitle>
               <CardDescription>
-                Coming soon - Financial insights and analytics
+                Search for ideas with financial impact
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">This feature is under development</p>
+              <form onSubmit={handleMoneySearch} className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter search keyword"
+                    value={moneyKeyword}
+                    onChange={(e) => setMoneyKeyword(e.target.value)}
+                    required
+                    className="flex-1"
+                    disabled={moneyLoading}
+                  />
+                  <Button type="submit" disabled={moneyLoading}>
+                    {moneyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    Search
+                  </Button>
+                </div>
+                
+                {/* Loading display */}
+                {moneyLoading && (
+                  <div className="flex items-center justify-center p-4 bg-green-50 rounded-lg border">
+                    <DollarSign className="mr-3 h-5 w-5 animate-bounce text-green-600" />
+                    <span className="text-green-700 animate-pulse">
+                      Searching for money-making ideas...
+                    </span>
+                  </div>
+                )}
+              </form>
+            </CardContent>
+          </Card>}
+
+        {/* Money Results Table */}
+        {moneyResults.length > 0 && <Card>
+            <CardHeader>
+              <CardTitle>
+                Financial Results ({moneyResults.length})
+              </CardTitle>
+              <CardDescription>
+                Ideas with potential financial impact
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[120px] bg-green-100 font-bold">ID</TableHead>
+                      <TableHead className="min-w-[400px] bg-green-100 font-bold">Page Content</TableHead>
+                      <TableHead className="w-[120px] bg-green-100 font-bold cursor-pointer hover:bg-green-200" onClick={() => handleMoneySort('total_arr')}>
+                        <div className="flex items-center">
+                          ARR
+                          {renderMoneySortIcon('total_arr')}
+                        </div>
+                      </TableHead>
+                      <TableHead className="w-[100px] bg-green-100 font-bold cursor-pointer hover:bg-green-200" onClick={() => handleMoneySort('votes')}>
+                        <div className="flex items-center">
+                          Votes
+                          {renderMoneySortIcon('votes')}
+                        </div>
+                      </TableHead>
+                      <TableHead className="w-[120px] bg-green-100 font-bold cursor-pointer hover:bg-green-200" onClick={() => handleMoneySort('score')}>
+                        <div className="flex items-center">
+                          Relevance
+                          {renderMoneySortIcon('score')}
+                        </div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedMoneyResults.map((result, index) => <TableRow key={index} className="hover:bg-gray-50">
+                        <TableCell className="bg-green-50">
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
+                            onClick={() => handleIdeaClick(result.id)}
+                          >
+                            {result.id}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="bg-green-50">
+                          <p className="text-sm text-gray-600 whitespace-normal">
+                            {result.document.pageContent}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono bg-green-100 text-green-800 border-green-200">
+                            ${result.total_arr.toLocaleString()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono">
+                            {result.votes}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono">
+                            {result.score.toFixed(3)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>)}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>}
