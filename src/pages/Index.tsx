@@ -51,8 +51,11 @@ interface MoneyResult {
 }
 type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote' | 'summary' | 'productArea';
 type SortOrder = 'asc' | 'desc';
+type MoneySortField = 'score' | 'total_arr' | 'votes';
 type ActiveCard = 'release-matcher' | 'idea-doppelganger' | 'show-money' | null;
+
 const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
+
 const Index = () => {
   const [activeCard, setActiveCard] = useState<ActiveCard>(null);
   const [url, setUrl] = useState('');
@@ -442,6 +445,8 @@ const Index = () => {
     return moneySortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
 
+  const totalARR = moneyResults.reduce((sum, result) => sum + result.total_arr, 0);
+
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
@@ -452,7 +457,7 @@ const Index = () => {
 
         {/* Main Action Buttons */}
         {!activeCard && <div className="flex justify-center gap-4 flex-wrap">
-            <Button size="lg" className="flex items-center gap-2" onClick={() => setActiveCard('release-matcher')}>
+            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('release-matcher')}>
               <Search className="h-5 w-5" />
               Release Matcher
             </Button>
@@ -460,7 +465,7 @@ const Index = () => {
               <Bot className="h-5 w-5" />
               Idea Doppelgänger
             </Button>
-            <Button size="lg" variant="secondary" className="flex items-center gap-2" onClick={() => setActiveCard('show-money')}>
+            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('show-money')}>
               <DollarSign className="h-5 w-5" />
               Show Me The Money
             </Button>
@@ -591,12 +596,24 @@ const Index = () => {
         {/* Money Results Table */}
         {moneyResults.length > 0 && <Card>
             <CardHeader>
-              <CardTitle>
-                Financial Results ({moneyResults.length})
-              </CardTitle>
-              <CardDescription>
-                Ideas with potential financial impact
-              </CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>
+                    Financial Results ({moneyResults.length})
+                  </CardTitle>
+                  <CardDescription>
+                    Ideas with potential financial impact
+                  </CardDescription>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-600">
+                    ${totalARR.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Total ARR Impact
+                  </div>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border overflow-x-auto">
