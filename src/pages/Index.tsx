@@ -368,7 +368,7 @@ const Index = () => {
     
     setMoneyLoading(true);
     try {
-      const response = await fetch('http://localhost:5678/webhook-test/22b83529-18a6-4bf9-99f9-bab4475f1a0a', {
+      const response = await fetch('http://localhost:5678/webhook/22b83529-18a6-4bf9-99f9-bab4475f1a0a', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
