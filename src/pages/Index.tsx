@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign } from "lucide-react";
+import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface IdeaResult {
@@ -447,6 +447,10 @@ const Index = () => {
 
   const totalARR = moneyResults.reduce((sum, result) => sum + result.total_arr, 0);
 
+  const handleRemoveMoneyResult = (indexToRemove: number) => {
+    setMoneyResults(prevResults => prevResults.filter((_, index) => index !== indexToRemove));
+  };
+
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
@@ -640,6 +644,7 @@ const Index = () => {
                           {renderMoneySortIcon('score')}
                         </div>
                       </TableHead>
+                      <TableHead className="w-[100px] bg-green-100 font-bold">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -672,6 +677,16 @@ const Index = () => {
                           <Badge variant="outline" className="font-mono">
                             {result.score.toFixed(3)}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveMoneyResult(index)}
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>)}
                   </TableBody>
