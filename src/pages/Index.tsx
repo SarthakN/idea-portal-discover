@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import IdeaFlowAnimation from "@/components/IdeaFlowAnimation";
-
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -54,9 +53,7 @@ type SortField = 'score' | 'classification' | 'idea' | 'content' | 'releaseNote'
 type SortOrder = 'asc' | 'desc';
 type MoneySortField = 'score' | 'total_arr' | 'votes';
 type ActiveCard = 'release-matcher' | 'idea-doppelganger' | 'show-money' | null;
-
 const funnyLoadingMessages = ["Go grab a coffee… or make one for me too?", "Still faster than airport Wi-Fi.", "You wait. I'll pretend to optimize.", "Time is relative. Especially mine.", "Trying to look busy so you don't leave.", "Loading... because instant gratification is overrated.", "Every second you wait, a byte finds meaning.", "Negotiating with the loading gods. They're moody today."];
-
 const Index = () => {
   const [activeCard, setActiveCard] = useState<ActiveCard>(null);
   const [url, setUrl] = useState('');
@@ -362,11 +359,9 @@ const Index = () => {
     }
     return sortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
-
   const handleMoneySearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!moneyKeyword.trim()) return;
-    
     setMoneyLoading(true);
     try {
       const response = await fetch('http://localhost:5678/webhook/22b83529-18a6-4bf9-99f9-bab4475f1a0a', {
@@ -378,14 +373,11 @@ const Index = () => {
           keyword: moneyKeyword
         })
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       const data = await response.json();
       console.log('Money search response:', data);
-      
       setMoneyResults(Array.isArray(data) ? data : []);
       toast({
         title: "Search Complete! 💰",
@@ -402,7 +394,6 @@ const Index = () => {
       setMoneyLoading(false);
     }
   };
-
   const handleMoneySort = (field: MoneySortField) => {
     if (moneySortField === field) {
       setMoneySortOrder(moneySortOrder === 'asc' ? 'desc' : 'asc');
@@ -411,11 +402,9 @@ const Index = () => {
       setMoneySortOrder('desc');
     }
   };
-
   const sortedMoneyResults = [...moneyResults].sort((a, b) => {
     let aValue: any;
     let bValue: any;
-    
     if (moneySortField === 'score') {
       aValue = a.score;
       bValue = b.score;
@@ -426,11 +415,9 @@ const Index = () => {
       aValue = parseInt(a.votes) || 0;
       bValue = parseInt(b.votes) || 0;
     }
-    
     if (typeof aValue === 'number' && typeof bValue === 'number') {
       return moneySortOrder === 'desc' ? bValue - aValue : aValue - bValue;
     }
-    
     const aStr = String(aValue).toLowerCase();
     const bStr = String(bValue).toLowerCase();
     if (moneySortOrder === 'desc') {
@@ -438,33 +425,28 @@ const Index = () => {
     }
     return aStr.localeCompare(bStr);
   });
-
   const renderMoneySortIcon = (field: MoneySortField) => {
     if (moneySortField !== field) {
       return <ArrowUpDown className="h-4 w-4 ml-1" />;
     }
     return moneySortOrder === 'desc' ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronUp className="h-4 w-4 ml-1" />;
   };
-
   const totalARR = moneyResults.reduce((sum, result) => sum + result.total_arr, 0);
-
   const handleRemoveMoneyResult = (indexToRemove: number) => {
     setMoneyResults(prevResults => prevResults.filter((_, index) => index !== indexToRemove));
   };
-
   const getActiveFeature = () => {
     if (loading) return 'release-matcher';
     if (doppelgangerLoading) return 'idea-doppelganger';
     if (moneyLoading) return 'show-money';
     return undefined;
   };
-
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Not a bad <strong>IDEA</strong> 😏</h1>
-          <p className="text-sm text-gray-600">One person's wild idea is another's Jira ticket.</p>
+          <h1 className="font-bold text-gray-900 text-4xl">Not a bad <strong>IDEA</strong> 😏</h1>
+          <p className="text-gray-600 text-xs">One person's wild idea is another's Jira ticket.</p>
         </div>
 
         {/* Main Action Buttons */}
@@ -484,9 +466,7 @@ const Index = () => {
           </div>}
 
         {/* Animated Visualization - Show when no active card or no results */}
-        {(!activeCard || (activeCard && results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0)) && (
-          <IdeaFlowAnimation activeFeature={getActiveFeature()} />
-        )}
+        {(!activeCard || activeCard && results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0) && <IdeaFlowAnimation activeFeature={getActiveFeature()} />}
 
         {/* Back Button */}
         {activeCard && <div className="flex justify-center">
@@ -582,15 +562,7 @@ const Index = () => {
             <CardContent>
               <form onSubmit={handleMoneySearch} className="space-y-4">
                 <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter search keyword"
-                    value={moneyKeyword}
-                    onChange={(e) => setMoneyKeyword(e.target.value)}
-                    required
-                    className="flex-1"
-                    disabled={moneyLoading}
-                  />
+                  <Input type="text" placeholder="Enter search keyword" value={moneyKeyword} onChange={e => setMoneyKeyword(e.target.value)} required className="flex-1" disabled={moneyLoading} />
                   <Button type="submit" disabled={moneyLoading}>
                     {moneyLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                     Search
@@ -598,14 +570,12 @@ const Index = () => {
                 </div>
                 
                 {/* Loading display */}
-                {moneyLoading && (
-                  <div className="flex items-center justify-center p-4 bg-green-50 rounded-lg border">
+                {moneyLoading && <div className="flex items-center justify-center p-4 bg-green-50 rounded-lg border">
                     <DollarSign className="mr-3 h-5 w-5 animate-bounce text-green-600" />
                     <span className="text-green-700 animate-pulse">
                       Searching for money-making ideas...
                     </span>
-                  </div>
-                )}
+                  </div>}
               </form>
             </CardContent>
           </Card>}
@@ -663,11 +633,7 @@ const Index = () => {
                   <TableBody>
                     {sortedMoneyResults.map((result, index) => <TableRow key={index} className="hover:bg-gray-50">
                         <TableCell className="bg-green-50">
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800"
-                            onClick={() => handleIdeaClick(result.id)}
-                          >
+                          <Button variant="link" className="p-0 h-auto font-medium text-blue-600 hover:text-blue-800" onClick={() => handleIdeaClick(result.id)}>
                             {result.id}
                           </Button>
                         </TableCell>
@@ -692,12 +658,7 @@ const Index = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRemoveMoneyResult(index)}
-                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                          >
+                          <Button variant="outline" size="sm" onClick={() => handleRemoveMoneyResult(index)} className="text-red-600 hover:text-red-800 hover:bg-red-50">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
@@ -870,5 +831,4 @@ const Index = () => {
       </div>
     </div>;
 };
-
 export default Index;
