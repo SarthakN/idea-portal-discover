@@ -441,11 +441,10 @@ const Index = () => {
     if (moneyLoading) return 'show-money';
     return undefined;
   };
-  //return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <p className="text-xs uppercase tracking-wide text-indigo-500">By Lovable</p>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
             <span className="inline-block transform transition-transform duration-300 hover:scale-110 hover:-rotate-2 bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
