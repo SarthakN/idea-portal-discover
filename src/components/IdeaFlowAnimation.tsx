@@ -1,13 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { Lightbulb, ArrowRight, DollarSign } from 'lucide-react';
+import { Lightbulb, Bot, Users, DollarSign } from 'lucide-react';
 
 interface IdeaFlowAnimationProps {
   activeFeature?: string;
 }
 
 const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) => {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; opacity: number }>>([]);
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; opacity: number; targetX: number; targetY: number }>>([]);
   const [pulseActive, setPulseActive] = useState(false);
 
   useEffect(() => {
@@ -22,22 +22,39 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
     const interval = setInterval(() => {
       setParticles(prev => {
         const newParticles = prev
-          .map(p => ({ ...p, x: p.x + 2, opacity: p.opacity - 0.02 }))
+          .map(p => ({
+            ...p,
+            x: p.x + (p.targetX - p.x) * 0.02,
+            y: p.y + (p.targetY - p.y) * 0.02,
+            opacity: p.opacity - 0.005
+          }))
           .filter(p => p.opacity > 0);
         
-        // Add new particle occasionally
-        if (Math.random() < 0.3) {
+        // Add new particles from center occasionally
+        if (Math.random() < 0.2) {
+          const centerX = 50;
+          const centerY = 50;
+          const targets = [
+            { x: 25, y: 30 }, // Top left AI bot
+            { x: 75, y: 30 }, // Top right AI bot
+            { x: 25, y: 70 }, // Bottom left AI bot
+            { x: 75, y: 70 }, // Bottom right AI bot
+          ];
+          const target = targets[Math.floor(Math.random() * targets.length)];
+          
           newParticles.push({
             id: Date.now() + Math.random(),
-            x: 0,
-            y: Math.random() * 100,
+            x: centerX,
+            y: centerY,
+            targetX: target.x,
+            targetY: target.y,
             opacity: 1
           });
         }
         
         return newParticles;
       });
-    }, 50);
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -47,82 +64,171 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
       <div className="text-center space-y-4">
         <h3 className="text-2xl font-bold text-gray-700">Transform Ideas into Impact</h3>
         <p className="text-gray-500 max-w-md">
-          Watch your ideas flow through our AI-powered pipeline, from concept to completion
+          Watch your ideas flow through our AI ecosystem, from concept to customer value
         </p>
       </div>
 
       {/* Main Flow Visualization */}
-      <div className="relative w-full max-w-4xl h-32 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-gray-200 overflow-hidden">
+      <div className="relative w-full max-w-5xl h-80 bg-gradient-to-br from-blue-50 via-purple-50 to-green-50 rounded-xl border border-gray-200 overflow-hidden">
         {/* Background gradient flow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/50 to-transparent animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-blue-100/30 to-transparent animate-pulse"></div>
         
         {/* Flowing particles */}
         {particles.map(particle => (
           <div
             key={particle.id}
-            className="absolute w-2 h-2 bg-blue-400 rounded-full"
+            className="absolute w-1.5 h-1.5 bg-blue-400 rounded-full"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
               opacity: particle.opacity,
-              transition: 'all 0.05s linear'
+              transition: 'all 0.1s linear'
             }}
           />
         ))}
 
-        {/* Main flow stages */}
-        <div className="relative z-10 flex items-center justify-between h-full px-8">
-          {/* Ideas (Lightbulbs) */}
-          <div className={`flex flex-col items-center space-y-2 transition-all duration-500 ${pulseActive ? 'scale-110' : ''}`}>
-            <Lightbulb 
-              className={`h-8 w-8 transition-colors duration-500 ${
-                pulseActive ? 'text-yellow-500 animate-pulse' : 'text-yellow-400'
-              }`} 
-            />
-            <span className="text-xs font-medium text-gray-600">Ideas</span>
-          </div>
+        {/* Connection Lines */}
+        <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+          {/* Lines from center to AI bots */}
+          <line x1="50%" y1="50%" x2="25%" y2="30%" stroke="#8B5CF6" strokeWidth="2" opacity="0.4" strokeDasharray="5,5">
+            <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite" />
+          </line>
+          <line x1="50%" y1="50%" x2="75%" y2="30%" stroke="#8B5CF6" strokeWidth="2" opacity="0.4" strokeDasharray="5,5">
+            <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite" />
+          </line>
+          <line x1="50%" y1="50%" x2="25%" y2="70%" stroke="#8B5CF6" strokeWidth="2" opacity="0.4" strokeDasharray="5,5">
+            <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite" />
+          </line>
+          <line x1="50%" y1="50%" x2="75%" y2="70%" stroke="#8B5CF6" strokeWidth="2" opacity="0.4" strokeDasharray="5,5">
+            <animate attributeName="stroke-dashoffset" values="0;10" dur="2s" repeatCount="indefinite" />
+          </line>
+          
+          {/* Lines from AI bots to outcomes */}
+          <line x1="25%" y1="30%" x2="15%" y2="15%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="25%" y1="30%" x2="35%" y2="15%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="75%" y1="30%" x2="65%" y2="15%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="75%" y1="30%" x2="85%" y2="15%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="25%" y1="70%" x2="15%" y2="85%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="25%" y1="70%" x2="35%" y2="85%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="75%" y1="70%" x2="65%" y2="85%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+          <line x1="75%" y1="70%" x2="85%" y2="85%" stroke="#10B981" strokeWidth="2" opacity="0.4" strokeDasharray="3,3">
+            <animate attributeName="stroke-dashoffset" values="0;6" dur="1.5s" repeatCount="indefinite" />
+          </line>
+        </svg>
 
-          {/* Flow Arrow 1 */}
-          <div className="flex-1 flex items-center justify-center">
-            <ArrowRight className="h-6 w-6 text-blue-400 animate-pulse" />
-            <div className="flex-1 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 mx-2"></div>
-            <ArrowRight className="h-6 w-6 text-purple-400 animate-pulse" />
-          </div>
-
-          {/* Pipeline Processing */}
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-blue-500 rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-sm animate-spin"></div>
+        {/* Center - Ideas */}
+        <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
+          <div className={`flex flex-col items-center space-y-2 transition-all duration-500 ${pulseActive ? 'scale-125' : ''}`}>
+            <div className="relative">
+              <Lightbulb 
+                className={`h-12 w-12 transition-colors duration-500 ${
+                  pulseActive ? 'text-yellow-500 animate-pulse' : 'text-yellow-400'
+                }`} 
+              />
+              <div className="absolute inset-0 bg-yellow-400 rounded-full opacity-20 animate-ping"></div>
             </div>
-            <span className="text-xs font-medium text-gray-600">AI Pipeline</span>
+            <span className="text-sm font-bold text-gray-700 bg-white/80 px-2 py-1 rounded">Ideas</span>
           </div>
+        </div>
 
-          {/* Flow Arrow 2 */}
-          <div className="flex-1 flex items-center justify-center">
-            <ArrowRight className="h-6 w-6 text-purple-400 animate-pulse" />
-            <div className="flex-1 h-0.5 bg-gradient-to-r from-purple-400 to-green-400 mx-2"></div>
-            <ArrowRight className="h-6 w-6 text-green-400 animate-pulse" />
+        {/* AI Bots - Four corners around center */}
+        <div className="absolute" style={{ left: '25%', top: '30%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
           </div>
-
-          {/* Jira Tickets */}
-          <div className="flex flex-col items-center space-y-2">
-            <div className="w-8 h-8 bg-blue-600 rounded text-white text-xs font-bold flex items-center justify-center">
-              J
-            </div>
-            <span className="text-xs font-medium text-gray-600">Jira</span>
+        </div>
+        
+        <div className="absolute" style={{ left: '75%', top: '30%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
           </div>
-
-          {/* Flow Arrow 3 */}
-          <div className="flex-1 flex items-center justify-center">
-            <ArrowRight className="h-6 w-6 text-green-400 animate-pulse" />
-            <div className="flex-1 h-0.5 bg-gradient-to-r from-green-400 to-emerald-500 mx-2"></div>
-            <ArrowRight className="h-6 w-6 text-emerald-500 animate-pulse" />
+        </div>
+        
+        <div className="absolute" style={{ left: '25%', top: '70%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '1s' }} />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
           </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '75%', top: '70%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
+          </div>
+        </div>
 
-          {/* Value (Money) */}
-          <div className="flex flex-col items-center space-y-2">
-            <DollarSign className="h-8 w-8 text-green-600 animate-bounce" />
-            <span className="text-xs font-medium text-gray-600">Value</span>
+        {/* Voice of Customer - Top corners */}
+        <div className="absolute" style={{ left: '15%', top: '15%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Users className="h-6 w-6 text-blue-500 animate-pulse" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '35%', top: '15%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Users className="h-6 w-6 text-blue-500 animate-pulse" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '65%', top: '15%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Users className="h-6 w-6 text-blue-500 animate-pulse" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '85%', top: '15%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <Users className="h-6 w-6 text-blue-500 animate-pulse" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer</span>
+          </div>
+        </div>
+
+        {/* Dollar Values - Bottom corners */}
+        <div className="absolute" style={{ left: '15%', top: '85%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">$$$</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '35%', top: '85%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Value</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '65%', top: '85%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">$$$</span>
+          </div>
+        </div>
+        
+        <div className="absolute" style={{ left: '85%', top: '85%', zIndex: 2 }}>
+          <div className="flex flex-col items-center space-y-1">
+            <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Value</span>
           </div>
         </div>
       </div>
