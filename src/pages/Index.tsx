@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import IdeaFlowAnimation from "@/components/IdeaFlowAnimation";
 
 interface IdeaResult {
   id: string | number;
@@ -451,6 +452,13 @@ const Index = () => {
     setMoneyResults(prevResults => prevResults.filter((_, index) => index !== indexToRemove));
   };
 
+  const getActiveFeature = () => {
+    if (loading) return 'release-matcher';
+    if (doppelgangerLoading) return 'idea-doppelganger';
+    if (moneyLoading) return 'show-money';
+    return undefined;
+  };
+
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
@@ -474,6 +482,11 @@ const Index = () => {
               Show Me The Money
             </Button>
           </div>}
+
+        {/* Animated Visualization - Show when no active card or no results */}
+        {(!activeCard || (activeCard && results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0)) && (
+          <IdeaFlowAnimation activeFeature={getActiveFeature()} />
+        )}
 
         {/* Back Button */}
         {activeCard && <div className="flex justify-center">
@@ -597,7 +610,7 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Money Results Table */}
+        {/* Money Results Table - Only show when there are results */}
         {moneyResults.length > 0 && <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -695,7 +708,7 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Doppelgänger Results Table */}
+        {/* Doppelgänger Results Table - Only show when there are results */}
         {doppelgangerResults.length > 0 && <Card>
             <CardHeader>
               <CardTitle>
@@ -753,7 +766,7 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Results Table */}
+        {/* Results Table - Only show when there are results */}
         {results.length > 0 && <Card>
             <CardHeader>
               <CardTitle>
@@ -857,4 +870,5 @@ const Index = () => {
       </div>
     </div>;
 };
+
 export default Index;
