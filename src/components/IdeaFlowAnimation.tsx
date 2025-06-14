@@ -149,28 +149,28 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '25%', top: '30%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '75%', top: '30%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '25%', top: '70%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '1s' }} />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '75%', top: '70%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Bot className="h-8 w-8 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI Bot</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">AI</span>
           </div>
         </div>
 
@@ -185,7 +185,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '35%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice Customer</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice of Customer</span>
           </div>
         </div>
         
@@ -199,7 +199,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '85%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer of Customer</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice of Customer</span>
           </div>
         </div>
 
