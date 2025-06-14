@@ -445,10 +445,10 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900">
             
             <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-              sparkline
+              SPARKLINE
             </span>{' '}
           </h1>
           <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
