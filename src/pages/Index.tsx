@@ -446,8 +446,8 @@ const Index = () => {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            <span className="px-2 py-0.5 border border-gray-300 rounded text-gray-600 font-medium bg-white shadow-sm">Not a Bad</span>{' '}
-            <span className="px-2 py-0.5 border border-gray-300 rounded text-gray-800 font-medium bg-white shadow-sm">
+            <span className="px-2 py-0.5 text-gray-600 font-medium">Not a Bad</span>{' '}
+            <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
               IDEA
             </span>{' '}
             😏
