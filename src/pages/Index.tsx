@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Search, ArrowUpDown, Bot, ChevronUp, ChevronDown, Upload, DollarSign, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import IdeaFlowAnimation from "@/components/IdeaFlowAnimation";
+
 interface IdeaResult {
   id: string | number;
   productArea?: string;
@@ -454,29 +454,39 @@ const Index = () => {
           <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
         </div>
 
-        {/* Main Action Buttons */}
-        {!activeCard && <div className="flex justify-center gap-4 flex-wrap">
-            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('release-matcher')}>
-              <Search className="h-5 w-5" />
-              Release Matcher
-            </Button>
-            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('idea-doppelganger')}>
-              <Bot className="h-5 w-5" />
-              Idea Doppelgänger
-            </Button>
-            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={() => setActiveCard('show-money')}>
-              <DollarSign className="h-5 w-5" />
-              Show Me The Money
-            </Button>
-          </div>}
+        {/* Main Action Buttons - Always show above animation */}
+        <div className="flex justify-center gap-4 flex-wrap">
+          <Button 
+            size="lg" 
+            variant={activeCard === 'release-matcher' ? "default" : "outline"} 
+            className="flex items-center gap-2" 
+            onClick={() => setActiveCard('release-matcher')}
+          >
+            <Search className="h-5 w-5" />
+            Release Matcher
+          </Button>
+          <Button 
+            size="lg" 
+            variant={activeCard === 'idea-doppelganger' ? "default" : "outline"} 
+            className="flex items-center gap-2" 
+            onClick={() => setActiveCard('idea-doppelganger')}
+          >
+            <Bot className="h-5 w-5" />
+            Idea Doppelgänger
+          </Button>
+          <Button 
+            size="lg" 
+            variant={activeCard === 'show-money' ? "default" : "outline"} 
+            className="flex items-center gap-2" 
+            onClick={() => setActiveCard('show-money')}
+          >
+            <DollarSign className="h-5 w-5" />
+            Show Me The Money
+          </Button>
+        </div>
 
-        {/* Animated Visualization - Show when no active card or no results */}
-        {(!activeCard || activeCard && results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0) && <IdeaFlowAnimation activeFeature={getActiveFeature()} />}
-
-        {/* Back Button */}
-        {activeCard && <div className="flex justify-center">
-            <Button variant="ghost" onClick={() => setActiveCard(null)} className="mb-4">← Go Back</Button>
-          </div>}
+        {/* Animated Visualization - Show when no results or when a card is active but no results */}
+        {(results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0) && <IdeaFlowAnimation activeFeature={getActiveFeature()} />}
 
         {/* Release Matcher Card */}
         {activeCard === 'release-matcher' && <Card className="w-full max-w-2xl mx-auto">
@@ -820,16 +830,6 @@ const Index = () => {
                       </TableRow>)}
                   </TableBody>
                 </Table>
-              </div>
-            </CardContent>
-          </Card>}
-
-        {/* Empty State */}
-        {!loading && results.length === 0 && activeCard === 'release-matcher' && <Card className="text-center py-12">
-            <CardContent>
-              <div className="space-y-2">
-                <Search className="h-12 w-12 text-gray-400 mx-auto" />
-                <h3 className="text-lg font-medium text-gray-900">No ideas found yet</h3>
               </div>
             </CardContent>
           </Card>}
