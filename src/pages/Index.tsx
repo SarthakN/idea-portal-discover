@@ -445,8 +445,10 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="font-bold text-gray-900 text-4xl">Not a bad <strong>IDEA</strong> 😏</h1>
-          <p className="text-gray-600 text-xs">One person's wild idea is another's Jira ticket.</p>
+
+          <h1 className="text-xl font-bold text-gray-900">NOT A BAD <strong>IDEA</strong> 😏</h1>
+          <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
+
         </div>
 
         {/* Main Action Buttons */}
