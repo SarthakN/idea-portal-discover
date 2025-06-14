@@ -447,8 +447,10 @@ const Index = () => {
         <div className="text-center space-y-2">
 
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            <span className="uppercase text-black-600">Not a Bad</span>{' '}
-            <span className="font-serif italic text-black-800">Idea</span>{' '}
+            <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
+            <span className="inline-block text-indigo-700 transition-transform duration-300 hover:scale-110 hover:-rotate-2">
+              IDEA
+            </span>{' '}
             😏
           </h1>
           <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
