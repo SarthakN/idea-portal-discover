@@ -448,11 +448,9 @@ const Index = () => {
 
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
             <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
-            <span className="px-2 py-1 border-2 border-indigo-500 rounded-md text-indigo-700">
-            IDEA
-          </span>{' '}
-  😏
-</h1>
+            <span className="font-serif italic text-purple-700">IDEA</span>{' '}
+            😏
+          </h1>
           <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
 
         </div>
