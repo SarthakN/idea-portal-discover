@@ -454,7 +454,7 @@ const Index = () => {
           <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
         </div>
 
-        {/* Main Action Buttons - Always show above animation */}
+        {/* Main Action Buttons - Always show above cards */}
         <div className="flex justify-center gap-4 flex-wrap">
           <Button 
             size="lg" 
@@ -485,10 +485,7 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Animated Visualization - Show when no results or when a card is active but no results */}
-        {(results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0) && <IdeaFlowAnimation activeFeature={getActiveFeature()} />}
-
-        {/* Release Matcher Card */}
+        {/* Feature Cards - Show between buttons and animation */}
         {activeCard === 'release-matcher' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -527,7 +524,6 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Idea Doppelgänger Card */}
         {activeCard === 'idea-doppelganger' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -563,7 +559,6 @@ const Index = () => {
             </CardContent>
           </Card>}
 
-        {/* Show Me The Money Card */}
         {activeCard === 'show-money' && <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -594,6 +589,9 @@ const Index = () => {
               </form>
             </CardContent>
           </Card>}
+
+        {/* Animated Visualization - Show when no results or when a card is active but no results */}
+        {(results.length === 0 && doppelgangerResults.length === 0 && moneyResults.length === 0) && <IdeaFlowAnimation activeFeature={getActiveFeature()} />}
 
         {/* Money Results Table - Only show when there are results */}
         {moneyResults.length > 0 && <Card>
