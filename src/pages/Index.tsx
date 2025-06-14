@@ -450,7 +450,6 @@ const Index = () => {
             <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
               IDEA
             </span>{' '}
-            😏
           </h1>
           <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
         </div>
