@@ -62,7 +62,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
   return (
     <div className="flex flex-col items-center justify-center py-16 space-y-8">
       <div className="text-center space-y-4">
-        <h3 className="text-4xl font-bold text-gray-700">From Spark to Shipping 🚀</h3>
+        <h3 className="text-4xl text-gray-700">From Spark to Shipping 🚀</h3>
         <p className="text-gray-500 max-w-md">
           See how ideas move through our AI engine — turning customer voices into real, valuable outcomes.
         </p>
