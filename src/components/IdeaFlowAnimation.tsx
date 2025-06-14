@@ -178,28 +178,28 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '15%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice of Customer</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '35%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice Customer</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '65%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Voice of Customer</span>
           </div>
         </div>
         
         <div className="absolute" style={{ left: '85%', top: '15%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <Users className="h-6 w-6 text-blue-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Customer of Customer</span>
           </div>
         </div>
 
@@ -207,7 +207,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '15%', top: '85%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">$$$</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Value</span>
           </div>
         </div>
         
@@ -221,7 +221,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         <div className="absolute" style={{ left: '65%', top: '85%', zIndex: 2 }}>
           <div className="flex flex-col items-center space-y-1">
             <DollarSign className="h-6 w-6 text-green-600 animate-bounce" />
-            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">$$$</span>
+            <span className="text-xs font-medium text-gray-600 bg-white/80 px-1 py-0.5 rounded">Value</span>
           </div>
         </div>
         
