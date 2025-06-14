@@ -451,7 +451,7 @@ const Index = () => {
               SPARKLINE
             </span>{' '}
           </h1>
-          <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
+          <p className="text-sm text-gray-600 italic">Map the sparks that matter</p>
         </div>
 
         {/* Main Action Buttons - Always show above cards */}
