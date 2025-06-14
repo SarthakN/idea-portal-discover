@@ -444,12 +444,13 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-
-          <h1 className="text-xl font-bold text-gray-900">NOT A BAD <strong>IDEA</strong> 😏</h1>
-          <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
-
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
+          <span className="bg-gradient-to-r from-indigo-500 to-pink-500 text-transparent bg-clip-text">
+          IDEA
+          </span>{' '}
+          😏
+        </h1>
 
         {/* Main Action Buttons */}
         {!activeCard && <div className="flex justify-center gap-4 flex-wrap">
