@@ -445,27 +445,15 @@ const Index = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <p className="text-xs uppercase tracking-wide text-indigo-500">By Lovable</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
-            <svg
-              className="inline h-8 align-middle"
-              viewBox="0 0 100 24"
-              fill="url(#grad)"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style={{ stopColor: '#6366f1', stopOpacity: 1 }} />
-                  <stop offset="100%" style={{ stopColor: '#ec4899', stopOpacity: 1 }} />
-                </linearGradient>
-              </defs>
-              <text x="0" y="18" fontSize="20" fontWeight="bold" fontFamily="Arial">IDEA</text>
-            </svg>{' '}
+            <span className="inline-block transform transition-transform duration-300 hover:scale-110 hover:-rotate-2 bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
+              IDEA
+            </span>{' '}
             😏
           </h1>
-          <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
-
+          <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
         </div>
 
         {/* Main Action Buttons */}
