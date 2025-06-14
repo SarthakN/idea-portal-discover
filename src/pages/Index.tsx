@@ -444,16 +444,25 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2 py-6">
+          {/* Optional product label */}
+          <p className="text-xs uppercase tracking-wide text-indigo-500 font-medium">
+            Product Studio Tool
+          </p>
+
+          {/* Main heading */}
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
-            <span className="inline-block transform transition-transform duration-300 hover:scale-110 hover:-rotate-2 bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="inline-block transform transition-transform duration-300 hover:scale-110 hover:-rotate-2 bg-gradient-to-r from-rose-400 via-orange-300 to-yellow-300 bg-clip-text text-transparent">
               IDEA
             </span>{' '}
-            😏
+            <span role="img" aria-label="smirk">😏</span>
           </h1>
+
+          {/* Tagline */}
           <p className="text-sm text-gray-600 italic">Your chaos, our roadmap.</p>
         </div>
+
 
         {/* Main Action Buttons */}
         {!activeCard && <div className="flex justify-center gap-4 flex-wrap">
