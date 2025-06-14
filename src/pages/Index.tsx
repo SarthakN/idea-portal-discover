@@ -448,9 +448,20 @@ const Index = () => {
 
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
             <span className="uppercase text-indigo-600">Not a Bad</span>{' '}
-            <span className="inline-block text-indigo-700 transition-transform duration-300 hover:scale-110 hover:-rotate-2">
-              IDEA
-            </span>{' '}
+            <svg
+              className="inline h-8 align-middle"
+              viewBox="0 0 100 24"
+              fill="url(#grad)"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: '#6366f1', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#ec4899', stopOpacity: 1 }} />
+                </linearGradient>
+              </defs>
+              <text x="0" y="18" fontSize="20" fontWeight="bold" fontFamily="Arial">IDEA</text>
+            </svg>{' '}
             😏
           </h1>
           <p className="text-sm text-gray-600">Your chaos, our roadmap</p>
