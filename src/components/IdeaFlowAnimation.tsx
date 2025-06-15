@@ -246,7 +246,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '70%', top: '25%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '650%', top: '25%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
@@ -266,7 +266,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '70%', top: '75%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '65%', top: '75%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
