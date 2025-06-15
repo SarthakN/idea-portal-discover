@@ -61,10 +61,10 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
           const centerX = 50;
           const centerY = 50;
           const targets = [
-            { x: 20, y: 25 }, // Top left AI bot
-            { x: 80, y: 25 }, // Top right AI bot
-            { x: 20, y: 75 }, // Bottom left AI bot
-            { x: 80, y: 75 }, // Bottom right AI bot
+            { x: 30, y: 25 }, // Top left AI bot
+            { x: 70, y: 25 }, // Top right AI bot
+            { x: 30, y: 75 }, // Bottom left AI bot
+            { x: 70, y: 75 }, // Bottom right AI bot
           ];
           const target = targets[Math.floor(Math.random() * targets.length)];
           
