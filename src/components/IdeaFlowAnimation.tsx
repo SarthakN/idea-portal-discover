@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Lightbulb, Bot, Users, DollarSign, Zap, Target, TrendingUp, Heart } from 'lucide-react';
 
@@ -19,12 +18,12 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
     }
   }, [activeFeature]);
 
-  // Initialize floating background elements
+  // Initialize floating background elements with more spread
   useEffect(() => {
-    const elements = Array.from({ length: 8 }, (_, i) => ({
+    const elements = Array.from({ length: 6 }, (_, i) => ({
       id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
+      x: 10 + Math.random() * 80,
+      y: 10 + Math.random() * 80,
       rotation: Math.random() * 360
     }));
     setFloatingElements(elements);
@@ -58,14 +57,14 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
           .filter(p => p.opacity > 0);
         
         // Add new particles from center occasionally
-        if (Math.random() < 0.3) {
+        if (Math.random() < 0.2) {
           const centerX = 50;
           const centerY = 50;
           const targets = [
-            { x: 25, y: 30 }, // Top left AI bot
-            { x: 75, y: 30 }, // Top right AI bot
-            { x: 25, y: 70 }, // Bottom left AI bot
-            { x: 75, y: 70 }, // Bottom right AI bot
+            { x: 20, y: 25 }, // Top left AI bot
+            { x: 80, y: 25 }, // Top right AI bot
+            { x: 20, y: 75 }, // Bottom left AI bot
+            { x: 80, y: 75 }, // Bottom right AI bot
           ];
           const target = targets[Math.floor(Math.random() * targets.length)];
           
@@ -81,7 +80,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         
         return newParticles;
       });
-    }, 80);
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -94,15 +93,13 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
     { icon: TrendingUp, label: 'Growth', color: 'text-purple-600', bgColor: 'bg-purple-100' },
     { icon: Target, label: 'Impact', color: 'text-orange-500', bgColor: 'bg-orange-100' },
     { icon: Zap, label: 'Innovation', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    { icon: Users, label: 'Feedback', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
-    { icon: DollarSign, label: 'Revenue', color: 'text-emerald-600', bgColor: 'bg-emerald-100' },
   ];
 
-  const topOutcomes = outcomeElements.slice(0, 4);
-  const bottomOutcomes = outcomeElements.slice(4, 8);
+  const topOutcomes = outcomeElements.slice(0, 3);
+  const bottomOutcomes = outcomeElements.slice(3, 6);
 
   return (
-    <div className="relative w-full py-16 overflow-hidden">
+    <div className="relative w-full py-20 overflow-hidden">
       {/* Floating background elements */}
       {floatingElements.map(el => (
         <div
@@ -115,11 +112,11 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             zIndex: 0
           }}
         >
-          <Lightbulb className="h-8 w-8 text-gray-300" />
+          <Lightbulb className="h-6 w-6 text-gray-300" />
         </div>
       ))}
 
-      <div className="relative z-10 flex flex-col items-center justify-center space-y-8">
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-12">
         <div className="text-center space-y-4">
           <h3 className="text-4xl text-gray-500">From Spark to Shipping 🚀</h3>
           <p className="text-gray-500 max-w-md">
@@ -127,8 +124,8 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
           </p>
         </div>
 
-        {/* Main Flow Visualization - Blended with background */}
-        <div className="relative w-full max-w-6xl h-96">
+        {/* Main Flow Visualization - More spacious */}
+        <div className="relative w-full max-w-7xl h-[500px]">
           {/* Subtle background gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-green-50/30 rounded-3xl"></div>
           
@@ -142,7 +139,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
                 top: `${particle.y}%`,
                 opacity: particle.opacity,
                 transition: 'all 0.1s linear',
-                boxShadow: `0 0 ${particle.opacity * 10}px rgba(147, 51, 234, 0.5)`
+                boxShadow: `0 0 ${particle.opacity * 8}px rgba(147, 51, 234, 0.4)`
               }}
             />
           ))}
@@ -152,49 +149,49 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             {/* Lines from center to AI bots with gradient */}
             <defs>
               <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.2" />
               </linearGradient>
               <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#10B981" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.2" />
               </linearGradient>
             </defs>
             
-            {/* Center to AI bots */}
-            <line x1="50%" y1="50%" x2="25%" y2="30%" stroke="url(#gradient1)" strokeWidth="3" strokeDasharray="8,4">
+            {/* Center to AI bots - adjusted positions */}
+            <line x1="50%" y1="50%" x2="20%" y2="25%" stroke="url(#gradient1)" strokeWidth="2" strokeDasharray="8,4">
               <animate attributeName="stroke-dashoffset" values="0;12" dur="2s" repeatCount="indefinite" />
             </line>
-            <line x1="50%" y1="50%" x2="75%" y2="30%" stroke="url(#gradient1)" strokeWidth="3" strokeDasharray="8,4">
+            <line x1="50%" y1="50%" x2="80%" y2="25%" stroke="url(#gradient1)" strokeWidth="2" strokeDasharray="8,4">
               <animate attributeName="stroke-dashoffset" values="0;12" dur="2.2s" repeatCount="indefinite" />
             </line>
-            <line x1="50%" y1="50%" x2="25%" y2="70%" stroke="url(#gradient1)" strokeWidth="3" strokeDasharray="8,4">
+            <line x1="50%" y1="50%" x2="20%" y2="75%" stroke="url(#gradient1)" strokeWidth="2" strokeDasharray="8,4">
               <animate attributeName="stroke-dashoffset" values="0;12" dur="1.8s" repeatCount="indefinite" />
             </line>
-            <line x1="50%" y1="50%" x2="75%" y2="70%" stroke="url(#gradient1)" strokeWidth="3" strokeDasharray="8,4">
+            <line x1="50%" y1="50%" x2="80%" y2="75%" stroke="url(#gradient1)" strokeWidth="2" strokeDasharray="8,4">
               <animate attributeName="stroke-dashoffset" values="0;12" dur="2.4s" repeatCount="indefinite" />
             </line>
             
-            {/* AI bots to outcomes */}
+            {/* AI bots to outcomes - more spread out */}
             {topOutcomes.map((_, index) => (
               <g key={`top-${index}`}>
                 <line 
-                  x1="25%" y1="30%" 
-                  x2={`${15 + index * 20}%`} y2="15%" 
+                  x1="20%" y1="25%" 
+                  x2={`${20 + index * 25}%`} y2="8%" 
                   stroke="url(#gradient2)" 
-                  strokeWidth="2" 
+                  strokeWidth="1.5" 
                   strokeDasharray="4,2"
                 >
-                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.2 + index * 0.2}s`} repeatCount="indefinite" />
+                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.2 + index * 0.3}s`} repeatCount="indefinite" />
                 </line>
                 <line 
-                  x1="75%" y1="30%" 
-                  x2={`${15 + index * 20}%`} y2="15%" 
+                  x1="80%" y1="25%" 
+                  x2={`${20 + index * 25}%`} y2="8%" 
                   stroke="url(#gradient2)" 
-                  strokeWidth="2" 
+                  strokeWidth="1.5" 
                   strokeDasharray="4,2"
                 >
-                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.4 + index * 0.2}s`} repeatCount="indefinite" />
+                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.4 + index * 0.3}s`} repeatCount="indefinite" />
                 </line>
               </g>
             ))}
@@ -202,22 +199,22 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             {bottomOutcomes.map((_, index) => (
               <g key={`bottom-${index}`}>
                 <line 
-                  x1="25%" y1="70%" 
-                  x2={`${15 + index * 20}%`} y2="85%" 
+                  x1="20%" y1="75%" 
+                  x2={`${20 + index * 25}%`} y2="92%" 
                   stroke="url(#gradient2)" 
-                  strokeWidth="2" 
+                  strokeWidth="1.5" 
                   strokeDasharray="4,2"
                 >
-                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.6 + index * 0.2}s`} repeatCount="indefinite" />
+                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.6 + index * 0.3}s`} repeatCount="indefinite" />
                 </line>
                 <line 
-                  x1="75%" y1="70%" 
-                  x2={`${15 + index * 20}%`} y2="85%" 
+                  x1="80%" y1="75%" 
+                  x2={`${20 + index * 25}%`} y2="92%" 
                   stroke="url(#gradient2)" 
-                  strokeWidth="2" 
+                  strokeWidth="1.5" 
                   strokeDasharray="4,2"
                 >
-                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.8 + index * 0.2}s`} repeatCount="indefinite" />
+                  <animate attributeName="stroke-dashoffset" values="0;6" dur={`${1.8 + index * 0.3}s`} repeatCount="indefinite" />
                 </line>
               </g>
             ))}
@@ -225,76 +222,75 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
 
           {/* Center - Ideas */}
           <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
-            <div className={`flex flex-col items-center space-y-2 transition-all duration-500 ${pulseActive ? 'scale-125' : ''}`}>
+            <div className={`flex flex-col items-center space-y-3 transition-all duration-500 ${pulseActive ? 'scale-125' : ''}`}>
               <div className="relative">
                 <Lightbulb 
                   className={`h-16 w-16 transition-colors duration-500 ${
                     pulseActive ? 'text-yellow-400 animate-pulse' : 'text-yellow-500'
                   }`} 
                 />
-                <div className="absolute inset-0 bg-yellow-400 rounded-full opacity-20 animate-ping"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-10 animate-pulse"></div>
+                <div className="absolute inset-0 bg-yellow-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-lg font-bold text-gray-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">💡 Ideas</span>
+              <span className="text-lg font-bold text-gray-700 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm">💡 Ideas</span>
             </div>
           </div>
 
-          {/* AI Bots - Four corners around center */}
-          <div className="absolute" style={{ left: '25%', top: '30%', zIndex: 2 }}>
-            <div className="flex flex-col items-center space-y-1">
+          {/* AI Bots - More spread out positions */}
+          <div className="absolute" style={{ left: '20%', top: '25%', zIndex: 2 }}>
+            <div className="flex flex-col items-center space-y-2">
               <div className="relative">
-                <Bot className="h-10 w-10 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
-                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-20 animate-ping"></div>
+                <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
+                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm">🤖 AI</span>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '75%', top: '30%', zIndex: 2 }}>
-            <div className="flex flex-col items-center space-y-1">
+          <div className="absolute" style={{ left: '80%', top: '25%', zIndex: 2 }}>
+            <div className="flex flex-col items-center space-y-2">
               <div className="relative">
-                <Bot className="h-10 w-10 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
-                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-20 animate-ping"></div>
+                <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm">🤖 AI</span>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '25%', top: '70%', zIndex: 2 }}>
-            <div className="flex flex-col items-center space-y-1">
+          <div className="absolute" style={{ left: '20%', top: '75%', zIndex: 2 }}>
+            <div className="flex flex-col items-center space-y-2">
               <div className="relative">
-                <Bot className="h-10 w-10 text-purple-500 animate-bounce" style={{ animationDelay: '1s' }} />
-                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-20 animate-ping"></div>
+                <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '1s' }} />
+                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm">🤖 AI</span>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '75%', top: '70%', zIndex: 2 }}>
-            <div className="flex flex-col items-center space-y-1">
+          <div className="absolute" style={{ left: '80%', top: '75%', zIndex: 2 }}>
+            <div className="flex flex-col items-center space-y-2">
               <div className="relative">
-                <Bot className="h-10 w-10 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
-                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-20 animate-ping"></div>
+                <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
+                <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm">🤖 AI</span>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
             </div>
           </div>
 
-          {/* Top Outcomes - Mixed customer voice and value */}
+          {/* Top Outcomes - More spread out */}
           {topOutcomes.map((outcome, index) => {
             const IconComponent = outcome.icon;
             return (
               <div 
                 key={`top-${index}`}
                 className="absolute" 
-                style={{ left: `${15 + index * 20}%`, top: '15%', zIndex: 2 }}
+                style={{ left: `${20 + index * 25}%`, top: '8%', zIndex: 2 }}
               >
-                <div className="flex flex-col items-center space-y-1">
+                <div className="flex flex-col items-center space-y-2">
                   <div className="relative">
-                    <IconComponent className={`h-7 w-7 ${outcome.color} animate-pulse`} />
-                    <div className={`absolute inset-0 ${outcome.bgColor} rounded-full opacity-30 animate-ping`}></div>
+                    <IconComponent className={`h-8 w-8 ${outcome.color} animate-pulse`} />
+                    <div className={`absolute inset-0 ${outcome.bgColor} rounded-full opacity-25 animate-ping`}></div>
                   </div>
-                  <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm text-center">
+                  <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm text-center">
                     {outcome.label}
                   </span>
                 </div>
@@ -302,21 +298,21 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             );
           })}
 
-          {/* Bottom Outcomes - Mixed customer voice and value */}
+          {/* Bottom Outcomes - More spread out */}
           {bottomOutcomes.map((outcome, index) => {
             const IconComponent = outcome.icon;
             return (
               <div 
                 key={`bottom-${index}`}
                 className="absolute" 
-                style={{ left: `${15 + index * 20}%`, top: '85%', zIndex: 2 }}
+                style={{ left: `${20 + index * 25}%`, top: '92%', zIndex: 2 }}
               >
-                <div className="flex flex-col items-center space-y-1">
+                <div className="flex flex-col items-center space-y-2">
                   <div className="relative">
-                    <IconComponent className={`h-7 w-7 ${outcome.color} animate-bounce`} />
-                    <div className={`absolute inset-0 ${outcome.bgColor} rounded-full opacity-30 animate-ping`}></div>
+                    <IconComponent className={`h-8 w-8 ${outcome.color} animate-bounce`} />
+                    <div className={`absolute inset-0 ${outcome.bgColor} rounded-full opacity-25 animate-ping`}></div>
                   </div>
-                  <span className="text-xs font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-2 py-1 rounded shadow-sm text-center">
+                  <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm text-center">
                     {outcome.label}
                   </span>
                 </div>
@@ -326,7 +322,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
         </div>
 
         {/* Feature Status Indicators */}
-        <div className="flex space-x-6 text-sm text-gray-500">
+        <div className="flex space-x-8 text-sm text-gray-500">
           <div className={`flex items-center space-x-2 ${activeFeature === 'release-matcher' ? 'text-blue-600' : ''}`}>
             <div className={`w-2 h-2 rounded-full ${activeFeature === 'release-matcher' ? 'bg-blue-600 animate-pulse' : 'bg-gray-300'}`}></div>
             <span>Release Matcher</span>
