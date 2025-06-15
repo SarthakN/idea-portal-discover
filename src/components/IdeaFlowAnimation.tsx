@@ -242,7 +242,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
                 <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
+              {/* <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span> */}
             </div>
           </div>
           
