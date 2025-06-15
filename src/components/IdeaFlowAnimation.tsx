@@ -236,7 +236,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
           </div>
 
           {/* AI Bots - More spread out positions */}
-          <div className="absolute" style={{ left: '30%', top: '25%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '30%', top: '30%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0s' }} />
@@ -246,33 +246,33 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '65%', top: '25%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '65%', top: '30%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '0.5s' }} />
                 <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
+              
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '30%', top: '75%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '30%', top: '70%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '1s' }} />
                 <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
+              
             </div>
           </div>
           
-          <div className="absolute" style={{ left: '65%', top: '75%', zIndex: 2 }}>
+          <div className="absolute" style={{ left: '65%', top: '70%', zIndex: 2 }}>
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Bot className="h-12 w-12 text-purple-500 animate-bounce" style={{ animationDelay: '1.5s' }} />
                 <div className="absolute inset-0 bg-purple-400 rounded-full opacity-15 animate-ping"></div>
               </div>
-              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded shadow-sm">🤖 AI</span>
+              
             </div>
           </div>
 
