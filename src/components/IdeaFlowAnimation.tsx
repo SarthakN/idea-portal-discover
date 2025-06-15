@@ -99,7 +99,7 @@ const IdeaFlowAnimation: React.FC<IdeaFlowAnimationProps> = ({ activeFeature }) 
   const bottomOutcomes = outcomeElements.slice(3, 6);
 
   return (
-    <div className="relative w-full py-20 overflow-hidden">
+    <div className="relative w-full py-10 overflow-hidden">
       {/* Floating background elements */}
       {floatingElements.map(el => (
         <div
