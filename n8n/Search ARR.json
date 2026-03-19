@@ -1,0 +1,439 @@
+{
+  "name": "Search ARR",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "ideasportal",
+          "mode": "list",
+          "cachedResultName": "ideasportal"
+        },
+        "prompt": "={{ $json.body.keyword }}",
+        "topK": 25,
+        "options": {
+          "pineconeNamespace": "Ideas"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        -704,
+        -416
+      ],
+      "id": "af006ef8-f23e-47b5-bdb1-f79c154122e7",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "3Cv5r27qkiiAmBS2",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -288
+      ],
+      "id": "7124a4ab-0a94-43fe-85ee-c7419eeaaf0e",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "hxzJCuLE4aJw0tn5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:/Users/Sarthak.Navalakha/Desktop/n8n/salesforce_customer_arr.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -944
+      ],
+      "id": "716ad43c-79c8-4e33-ac46-26e5ba5e4948",
+      "name": "Read/Write Files from Disk",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:/Users/Sarthak.Navalakha/Desktop/n8n/ideas_ats_ss_june.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -736
+      ],
+      "id": "ebb55a2c-f71e-4033-8c17-baa15d852e62",
+      "name": "Read/Write Files from Disk1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "includeEmptyCells": true
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -944
+      ],
+      "id": "4e172e73-121c-4c61-ace3-4de138846b11",
+      "name": "Extract from File",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "includeEmptyCells": true
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -736
+      ],
+      "id": "8efba4b7-eb82-4fbf-8035-0b352db9e565",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "Billing Email",
+              "field2": "domain"
+            }
+          ]
+        },
+        "options": {
+          "multipleMatches": "all"
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        -848
+      ],
+      "id": "201e15d9-e4b0-4dd4-863c-7fc25cf85072",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.all();\n\nconst result = data.flatMap(row => {\n  const fieldName = \"Custom field (Idea Voters (External))\";\n  const voterField = row.json[fieldName];\n\n  const fieldName2 = \"Custom field (Idea Votes)\";\n  const votesField = row.json[fieldName2];\n\n  if (!voterField || typeof voterField !== 'string') return [];\n\n  return voterField\n    .split('\\n')\n    .map(line => ({\n      id: row.json.id || 'unknown-id',\n      raw_line: line.trim(),\n      votes: votesField\n    }));\n});\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -736
+      ],
+      "id": "ab053965-1c08-4c6b-a492-93f97f0ae35b",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();  // gets input from previous node\nconst seen = new Set();\nconst output = [];\n\nfor (const item of items) {\n  const id = item.json.id;\n  const raw_line = item.json.raw_line;\n  const votes = item.json.votes;\n\n  if (typeof raw_line === 'string') {\n    const match = raw_line.match(/mailto:([\\w.-]+)@([\\w.-]+)/);\n    if (match) {\n      const domain = match[2];\n      const key = `${id}|${domain}`;\n      if (!seen.has(key)) {\n        seen.add(key);\n        output.push({ json: { id, domain, votes } });\n      }\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -736
+      ],
+      "id": "f8c31757-f7f0-4ae6-b5f4-6fea315eef66",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const email = item.json[\"Billing Email\"];\n  const domain = typeof email === \"string\" && email.includes('@')\n    ? email.split('@')[1]\n    : email;\n\n  return {\n    json: {\n      ...item.json,\n      \"Billing Email\": domain\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -944
+      ],
+      "id": "8e8f0a3f-89fe-4d86-9b90-cf4fb4c60364",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map(e => e.json); // or your array of objects\nconst grouped = {};\n\nfor (const item of input) {\n  const id = item.id;\n  const arr = parseFloat(item.ARR || 0);\n\n  if (!grouped[id]) {\n    grouped[id] = {\n      id,\n      total_arr: 0,\n      votes: item.votes // preserve original votes (first occurrence)\n    };\n  }\n\n  grouped[id].total_arr += arr;\n}\n\n// Convert grouped results back into array\nconst result = Object.values(grouped);\n\nreturn result.map(r => ({ json: r }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -848
+      ],
+      "id": "6f0beab6-be67-4f44-893c-b11eba2d08e9",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "id",
+              "field2": "document.metadata.ID"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        736,
+        -688
+      ],
+      "id": "06685896-19fa-4db9-8e6d-f6909fc11f6c",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "244b946e-cb9e-4fed-8871-c0d30648c959",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 0.35,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        -512
+      ],
+      "id": "cb400c59-859c-4175-b204-8cf754a08a26",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "22b83529-18a6-4bf9-99f9-bab4475f1a0a",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -736
+      ],
+      "id": "46adc46c-5800-41ac-89d8-265e9023a8b7",
+      "name": "Webhook",
+      "webhookId": "22b83529-18a6-4bf9-99f9-bab4475f1a0a"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9646e81-f8df-4401-8671-a89c0b5585a1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed21f9501d566728293c9863d26da91b214d10b76c77c69907a51cde5019817f"
+  },
+  "id": "eheT1LVRYWJ4Wb5g",
+  "tags": []
+}

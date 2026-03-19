@@ -1,0 +1,426 @@
+{
+  "name": "Ideas webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "dimensions": 1024
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        48
+      ],
+      "id": "d54a42d0-a08e-44a7-9ab4-1dd76f835283",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "hxzJCuLE4aJw0tn5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=node C:/Users/Sarthak.Navalakha/Desktop/n8n/scrape_release_notes.js {{ $json.body.message }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -336
+      ],
+      "id": "ed962b95-e4f6-4de6-bce6-5e4974d2ac81",
+      "name": "Execute Command",
+      "notes": "const puppeteer = require('puppeteer');\n\n(async () => {\n  const url = process.argv[2];\n  if (!url) {\n    console.error('No URL provided');\n    process.exit(1);\n  }\n\n  const browser = await puppeteer.launch({\n    headless: true,\n    args: ['--no-sandbox', '--disable-setuid-sandbox'],\n  });\n\n  const page = await browser.newPage();\n  await page.goto(url, { waitUntil: 'networkidle2' });\n\n  // Get the full rendered HTML of the page\n  const content = await page.content();\n\n  console.log(JSON.stringify({ html: content }));\n\n  await browser.close();\n})();\n"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.stdout;\n\n// Simple regex to find the Product Updates table\nconst tableMatch = html.match(/<table[^>]*>[\\s\\S]*?<\\/table>/i);\nif (!tableMatch) {\n  throw new Error(\"Table not found\");\n}\n\nconst tableHtml = tableMatch[0];\n\n// Extract rows\nconst rowMatches = [...tableHtml.matchAll(/<tr[^>]*>([\\s\\S]*?)<\\/tr>/gi)];\n\nconst results = [];\n\n// Skip the header row\nfor (let i = 1; i < rowMatches.length; i++) {\n  const row = rowMatches[i][1];\n\n  const cols = [...row.matchAll(/<td[^>]*>([\\s\\S]*?)<\\/td>/gi)].map(match =>\n    match[1].replace(/<[^>]*>/g, '').replace(/\\s+/g, ' ').trim()\n  );\n\n  if (cols.length >= 4) {\n    results.push({\n      json: {\n        productArea: cols[0],\n        summary: cols[2],\n        releaseNote: cols[3],\n        id: i\n      }\n    });\n  }\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -336
+      ],
+      "id": "fb0905cf-5c40-4522-9f99-f33929763393",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        -192
+      ],
+      "id": "500c77d3-10bd-4ce2-a8fb-abeb96afc597",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "atsautomation",
+          "mode": "list",
+          "cachedResultName": "atsautomation"
+        },
+        "prompt": "={{ $json.productArea }}\n{{ $json.summary }}\n{{ $json.releaseNote }}",
+        "topK": 3,
+        "options": {
+          "pineconeNamespace": "Ideas portal"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        -192
+      ],
+      "id": "94b11a47-720f-4d60-90aa-7794c43e45d5",
+      "name": "Pinecone Vector Store",
+      "alwaysOutputData": true,
+      "credentials": {
+        "pineconeApi": {
+          "id": "3Cv5r27qkiiAmBS2",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Expecting two input items: [0] = idea, [1] = release note\n\nconst idea = $json.document;\n\nif ($json.score > 0.5) {\n  return {\n    json: {\n      id: $('Loop Over Items').item.json.id,\n      idea: idea.metadata.ID,\n      content: idea.pageContent,\n      score: $json.score\n    }\n  };\n}\n\nreturn {}; // Return nothing if score is not greater than 0.5\n\n\n/**\nconst idea = $json.document;\n\nreturn \n  {\n    json: {\n        //id:$('Loop Over Items').item.json.id,\n        idea: idea.metadata.ID,\n        content: idea.pageContent,\n        score: idea.score\n      }\n  }\n;\n**/\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        -64
+      ],
+      "id": "03cb2f4c-3dc5-4426-974d-387d9d2204cd",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        928,
+        -480
+      ],
+      "id": "398ccaaa-0414-4cd3-af91-00e864f8bced",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8186e3fd-4088-4dbd-83a9-249867c64014",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -336
+      ],
+      "id": "62e020e7-00db-461c-ab0a-069d6a0e7b06",
+      "name": "Webhook",
+      "webhookId": "8186e3fd-4088-4dbd-83a9-249867c64014"
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_Rgk3lnSPJzjzBAKsISjhMUSM",
+          "mode": "list",
+          "cachedResultName": "Ideas portal match finder"
+        },
+        "prompt": "define",
+        "text": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1440,
+        -640
+      ],
+      "id": "0dd62456-582d-436b-8421-e192d9435a9a",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "hxzJCuLE4aJw0tn5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "idea",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2032,
+        -480
+      ],
+      "id": "69225292-8e2e-4bdf-b20e-246995ba9527",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst result = [];\n\nfor (const item of items) {\n  const data = JSON.parse(item.json.output); // parse the stringified JSON\n  result.push({\n    json: {\n      idea: data.idea,\n      classification: data.classification\n    }\n  });\n}\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        -560
+      ],
+      "id": "aee63ca0-9605-4362-af99-4952b1640794",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.mode }}",
+                    "rightValue": "0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cd7ee32c-3fc7-45a9-b606-655b298cef31"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bfae567a-ed5d-462c-b25d-4c48228d0d6d",
+                    "leftValue": "={{ $('Webhook').item.json.body.mode }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1216,
+        -480
+      ],
+      "id": "865eb605-d3ea-472f-b4d9-398871f8538a",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        []
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0c8c6b05-1416-4bbf-a13e-280efa79fb69",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed21f9501d566728293c9863d26da91b214d10b76c77c69907a51cde5019817f"
+  },
+  "id": "JCoLXNcVcTadmRhH",
+  "tags": []
+}

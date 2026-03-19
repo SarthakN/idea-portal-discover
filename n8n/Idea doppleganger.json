@@ -1,0 +1,163 @@
+{
+  "name": "Idea doppleganger",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4698c4cd-b508-441c-a21c-1a3fd39ec2ad",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1ceee6a0-c477-46ed-b3a1-96ee1e800f1d",
+      "name": "Webhook",
+      "webhookId": "4698c4cd-b508-441c-a21c-1a3fd39ec2ad"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        -80
+      ],
+      "id": "a7735e03-920a-4b7a-ab8c-41c9cabbc272",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "temp_ideas.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -80
+      ],
+      "id": "36fca508-cea3-4643-b4b7-18a0a44980b1",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "python C:\\Users\\Sarthak.Navalakha\\Desktop\\n8n\\similarity_pinecone_optimized.py --input \"temp_ideas.json\" --min-similarity 0.8"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -80
+      ],
+      "id": "8b7fad35-f938-406e-a300-9063ff8cfc04",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "jsCode": "const dataArray = $input.first().json.body.data;\nreturn dataArray;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -16
+      ],
+      "id": "7aeaea7d-8213-47ad-a578-4d86d7b648a8",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.stdout;\n\nlet dataArray;\n\n// If raw is a string, parse it\nif (typeof raw === 'string') {\n  dataArray = JSON.parse(raw);\n} else {\n  dataArray = raw;\n}\n\n// Ensure it's an array\nif (!Array.isArray(dataArray)) {\n  dataArray = [dataArray];\n}\n\n// Wrap items properly for n8n\nreturn dataArray.map(item => ({ json: item }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        -128
+      ],
+      "id": "ee13778d-b5bc-469c-866d-b32ceefa3a03",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ae38917d-abad-4b5a-8220-d4dd13b88e40",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed21f9501d566728293c9863d26da91b214d10b76c77c69907a51cde5019817f"
+  },
+  "id": "hUQnaQ8SEF6aNEDj",
+  "tags": []
+}
