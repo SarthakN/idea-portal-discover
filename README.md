@@ -1,151 +1,250 @@
-# Idea Portal Discover
+# 🚀 Idea Portal Discover
 
-## Problem Statement
+Turn unstructured customer feedback into actionable product insights.
 
-Submitted ideas by customers as feedback for products get lost due to lack of structure, volume, and no way to organize.
+---
 
-## Solutions
+## 📌 Overview
 
-1. **Find duplicate ideas**: Identify and group similar customer-submitted ideas to reduce redundancy and focus on unique feedback.
+Customer ideas are one of the most valuable—but underutilized—sources of product insight. As volume grows, these ideas become fragmented, duplicated, and difficult to act on.
 
-2. **Find ideas that match the product roadmap and their impact in terms of ARR**: Discover customer ideas that align with planned product features and assess their potential revenue impact (Annual Recurring Revenue).
+**Idea Portal Discover** helps product teams:
+- Organize large volumes of customer ideas  
+- Identify high-impact opportunities  
+- Close the loop with customers  
 
-3. **Find ideas that match a release note to revert back to the customers**: Locate customer ideas that correspond to recent product releases, enabling targeted follow-up and communication with customers.
+---
 
-## Architecture
+## ❗ Problem
 
-1. **Loads all the ideas to a vector database**: Customer ideas are ingested and stored in a vector database for efficient semantic search and similarity matching.
+Customer-submitted ideas often:
+- Get buried due to **high volume**
+- Lack **structure and categorization**
+- Are **duplicated across users**
+- Have **no clear linkage to roadmap or releases**
 
-2. **Gets requests from UI**: The system receives queries and requests from a user interface, allowing users to search and analyze customer ideas.
+This leads to missed opportunities and poor customer communication.
 
-3. **Processes requests by using n8n supported by: scikit learn, OpenAI agents, and Vector db searches**: Requests are processed through n8n workflows that leverage scikit-learn for machine learning tasks, OpenAI agents for natural language processing, and vector database searches for semantic similarity matching.
+---
 
-                +-----------------------------+
-                |   Customer Idea Sources     |
-                | (CSV, Forms, APIs, etc.)   |
-                +-------------+---------------+
-                              |
-                              v
-                +-----------------------------+
-                |      Ingestion Layer        |
-                +-------------+---------------+
-                              |
-                              v
-                +-----------------------------+
-                |   Embedding Generation      |
-                | (OpenAI / ML Models)        |
-                +-------------+---------------+
-                              |
-                              v
-                +-----------------------------+
-                |      Vector Database        |
-                |   (Semantic Storage)        |
-                +-------------+---------------+
+## 💡 Solution
 
-                              ^
-                              |
-                +-------------+---------------+
-                |       n8n Workflow Engine   |
-                +------+------+--------------+
-                       |      | 
-                       |      |
-                       v      v
-        +----------------+   +----------------------+
-        | Vector Search  |   |  OpenAI Agents       |
-        | (Similarity)   |   | (NLP / Reasoning)    |
-        +----------------+   +----------------------+
-                       |
-                       v
-              +----------------------+
-              |   scikit-learn       |
-              | (ML Processing)      |
-              +----------+-----------+
-                         |
-                         v
-                +-----------------------------+
-                |   Processed Results         |
-                | (Themes, Scores, Insights)  |
-                +-------------+---------------+
-                              |
-                              v
-                +-----------------------------+
-                |        API Layer            |
-                +-------------+---------------+
-                              |
-                              v
-                +-----------------------------+
-                |      User Interface         |
-                |   (Search / Analysis UI)   |
-                +-----------------------------+
+### 1. 🔁 Deduplicate & Cluster Ideas
+Identify similar ideas using semantic similarity and group them into unified themes.
+- Reduces noise  
+- Surfaces true demand signals  
 
-## Project info
+### 2. 🎯 Map Ideas to Roadmap + ARR Impact
+Connect customer ideas to planned features and estimate their business impact.
+- Prioritize based on **revenue potential (ARR)**  
+- Validate roadmap decisions with real customer demand  
 
-**URL**: https://lovable.dev/projects/63ca8c8d-9631-4e9a-80c2-2e6b61fa1e10
+### 3. 🔄 Close the Feedback Loop
+Match shipped features (release notes) back to customer ideas.
+- Notify relevant customers  
+- Improve engagement and trust  
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🏗️ Architecture
 
-**Use Lovable**
+### High-Level Flow
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/63ca8c8d-9631-4e9a-80c2-2e6b61fa1e10) and start prompting.
+```text
+Customer Inputs → Embeddings → Vector DB → Processing Engine → Insights → UI
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+### System Components
 
-**Use your preferred IDE**
+1. **Ingestion Layer**
+   - Sources: CSV, Forms, APIs  
+   - Normalizes and prepares idea data  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Embedding Layer**
+   - Converts ideas into vector representations  
+   - Enables semantic understanding  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Vector Database**
+   - Stores embeddings for fast similarity search  
+   - Powers deduplication and clustering  
 
-Follow these steps:
+4. **Processing Engine (n8n Workflows)**
+   - Orchestrates:
+     - Vector search  
+     - OpenAI agents (NLP + reasoning)  
+     - scikit-learn (ML processing)  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+5. **Insights Layer**
+   - Outputs:
+     - Themes  
+     - Clusters  
+     - Impact scores  
+     - Mappings to roadmap/release notes  
+
+6. **API Layer**
+   - Serves processed insights to UI  
+
+7. **User Interface**
+   - Search and analyze ideas  
+   - Explore themes and impact  
+
+---
+
+### 🔄 Architecture Diagram
+
+```text
++-----------------------------+
+|   Customer Idea Sources     |
+| (CSV, Forms, APIs, etc.)   |
++-------------+---------------+
+              |
+              v
++-----------------------------+
+|      Ingestion Layer        |
++-------------+---------------+
+              |
+              v
++-----------------------------+
+|   Embedding Generation      |
+| (OpenAI / ML Models)        |
++-------------+---------------+
+              |
+              v
++-----------------------------+
+|      Vector Database        |
+|   (Semantic Storage)        |
++-------------+---------------+
+
+              ^
+              |
++-------------+---------------+
+|     n8n Workflow Engine     |
++------+------+--------------+
+       |      |
+       |      |
+       v      v
++----------------+   +----------------------+
+| Vector Search  |   |  OpenAI Agents       |
+| (Similarity)   |   | (NLP / Reasoning)    |
++----------------+   +----------------------+
+       |
+       v
++----------------------+
+|   scikit-learn       |
+| (ML Processing)      |
++----------+-----------+
+           |
+           v
++-----------------------------+
+|   Processed Insights        |
+| (Themes, Scores, Mapping)   |
++-------------+---------------+
+              |
+              v
++-----------------------------+
+|        API Layer            |
++-------------+---------------+
+              |
+              v
++-----------------------------+
+|      User Interface         |
+|   (Search / Analysis UI)    |
++-----------------------------+
+```
+
+---
+
+## 🔗 Project
+
+- 🌐 Live Project: https://lovable.dev/projects/63ca8c8d-9631-4e9a-80c2-2e6b61fa1e10  
+
+---
+
+## 🛠️ Getting Started
+
+### Option 1: Use Lovable (Recommended)
+
+1. Open the project on Lovable  
+2. Start prompting to make changes  
+3. Changes auto-sync to this repo  
+
+👉 https://lovable.dev/projects/63ca8c8d-9631-4e9a-80c2-2e6b61fa1e10  
+
+---
+
+### Option 2: Run Locally
+
+#### Prerequisites
+- Node.js (recommended via nvm)
+
+#### Setup
+
+```bash
+# Clone the repo
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Run dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Option 3: Edit in GitHub
 
-**Use GitHub Codespaces**
+- Open any file  
+- Click ✏️ Edit  
+- Commit changes  
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+### Option 4: Use GitHub Codespaces
 
-This project is built with:
+- Click **Code → Codespaces → New Codespace**  
+- Edit and push changes directly  
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## ⚙️ Tech Stack
 
-Simply open [Lovable](https://lovable.dev/projects/63ca8c8d-9631-4e9a-80c2-2e6b61fa1e10) and click on Share -> Publish.
+- **Frontend**: React, TypeScript, Vite  
+- **UI**: shadcn-ui, Tailwind CSS  
+- **AI/ML**:
+  - OpenAI (embeddings + agents)  
+  - scikit-learn  
+- **Workflow Orchestration**: n8n  
+- **Storage**: Vector Database  
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🚀 Deployment
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Deploy instantly via Lovable:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Open project  
+2. Click **Share → Publish**  
+
+---
+
+## 🌐 Custom Domain
+
+You can connect your own domain:
+
+1. Go to **Project → Settings → Domains**  
+2. Click **Connect Domain**  
+
+📖 Guide: https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide  
+
+---
+
+## ✨ Why This Project Matters
+
+This isn’t just a feedback tool—it’s a **decision intelligence layer for product teams**:
+- Bridges **customer voice → roadmap decisions**  
+- Adds **quantification (ARR impact)** to qualitative feedback  
+- Enables **closed-loop product
