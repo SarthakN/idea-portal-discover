@@ -1,4 +1,4 @@
- # 🚀 Idea Portal Discover
+ # 🚀 Idea Portal Discovery
 
 Turn unstructured customer feedback into actionable product insights.
 
